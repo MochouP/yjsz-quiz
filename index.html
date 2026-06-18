@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>一建市政·题库练习</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{--primary:#1a73e8;--primary-light:#e8f0fe;--success:#34a853;--danger:#ea4335;--warning:#fbbc04;--bg:#f5f7fa;--card:#fff;--text:#202124;--text2:#5f6368;--border:#dadce0;--radius:12px}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans SC",sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.app{max-width:800px;margin:0 auto;padding:12px 12px 80px}
+.header{display:flex;align-items:center;gap:12px;padding:12px 0;margin-bottom:8px}
+.header h1{font-size:20px;font-weight:700;flex:1}
+.header .badge{background:var(--primary);color:#fff;font-size:11px;padding:2px 10px;border-radius:20px;font-weight:600}
+.tabs{display:flex;gap:4px;background:var(--card);border-radius:var(--radius);padding:4px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.tab{flex:1;text-align:center;padding:10px 4px;border-radius:8px;font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;transition:.2s;border:none;background:none}
+.tab.active{background:var(--primary);color:#fff;font-weight:600}
+.tab:not(.active):active{background:#e8e8e8}
+.panel{display:none}
+.panel.active{display:block}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.stat-card{background:var(--card);border-radius:var(--radius);padding:16px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.stat-card .num{font-size:28px;font-weight:800;color:var(--primary)}
+.stat-card .label{font-size:12px;color:var(--text2);margin-top:4px}
+.stat-card.green .num{color:var(--success)}
+.stat-card.orange .num{color:#e37400}
+.stat-card.red .num{color:var(--danger)}
+.chapter-grid{display:grid;gap:8px}
+.chapter-btn{background:var(--card);border-radius:var(--radius);padding:14px 16px;box-shadow:0 1px 3px rgba(0,0,0,.06);cursor:pointer;border:2px solid transparent;transition:.2s;display:flex;align-items:center;justify-content:space-between}
+.chapter-btn:active{border-color:var(--primary);background:var(--primary-light)}
+.chapter-btn .name{font-size:14px;font-weight:500}
+.chapter-btn .count{font-size:12px;color:var(--text2)}
+.quick-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.qa-btn{background:var(--card);border-radius:var(--radius);padding:16px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.06);cursor:pointer;border:none;font-size:14px;font-weight:600;color:var(--text);transition:.2s}
+.qa-btn:active{transform:scale(.97);background:var(--primary-light)}
+.qa-btn .icon{font-size:24px;display:block;margin-bottom:6px}
+.q-card{background:var(--card);border-radius:var(--radius);padding:20px 16px;box-shadow:0 1px 3px rgba(0,0,0,.06);margin-bottom:16px}
+.q-meta{display:flex;justify-content:space-between;font-size:12px;color:var(--text2);margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.q-text{font-size:16px;line-height:1.7;margin-bottom:14px;font-weight:500}
+.options{display:flex;flex-direction:column;gap:8px}
+.option{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border-radius:10px;border:2px solid var(--border);cursor:pointer;transition:.2s;background:#fff;font-size:14px;line-height:1.5}
+.option:active{transform:scale(.98)}
+.option .tag{flex-shrink:0;width:24px;height:24px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:var(--bg);font-weight:700;font-size:13px;color:var(--text2)}
+.option .text{flex:1;padding-top:2px}
+.option.selected{border-color:var(--primary);background:var(--primary-light)}
+.option.selected .tag{background:var(--primary);color:#fff}
+.option.correct{border-color:var(--success);background:#e6f4ea}
+.option.correct .tag{background:var(--success);color:#fff}
+.option.wrong{border-color:var(--danger);background:#fce8e6}
+.option.wrong .tag{background:var(--danger);color:#fff}
+.option.disabled{cursor:default;pointer-events:none}
+.feedback{margin-top:14px;padding:14px;border-radius:10px;font-size:14px;line-height:1.6;display:none}
+.feedback.show{display:block}
+.feedback.correct{background:#e6f4ea;border-left:4px solid var(--success)}
+.feedback.wrong{background:#fce8e6;border-left:4px solid var(--danger)}
+.q-actions{display:flex;gap:10px;margin-top:14px}
+.q-actions button{flex:1;padding:12px;border-radius:10px;border:none;font-size:15px;font-weight:600;cursor:pointer;transition:.2s}
+.q-actions button:active{transform:scale(.97)}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-outline{background:#fff;color:var(--text2);border:2px solid var(--border)!important}
+.top-bar{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.back-btn{background:none;border:none;font-size:22px;cursor:pointer;padding:4px;color:var(--text)}
+.top-bar .title{font-size:16px;font-weight:600;flex:1}
+.top-bar .info{font-size:13px;color:var(--text2)}
+.progress-bar{height:4px;background:var(--border);border-radius:2px;margin-bottom:14px;overflow:hidden}
+.progress-bar .fill{height:100%;background:var(--primary);border-radius:2px;transition:width .3s}
+.empty{text-align:center;padding:40px 20px;color:var(--text2)}
+.empty .icon{font-size:48px;margin-bottom:12px}
+.wrong-item{background:var(--card);border-radius:var(--radius);padding:14px 16px;margin-bottom:8px;box-shadow:0 1px 3px rgba(0,0,0,.06);cursor:pointer}
+.wrong-item .ch{font-size:12px;color:var(--text2);margin-bottom:4px}
+.wrong-item .q{font-size:14px;font-weight:500;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.wrong-item .tag-w{display:inline-block;background:#fce8e6;color:var(--danger);font-size:11px;padding:1px 8px;border-radius:4px;margin-top:4px}
+.setting-row{display:flex;align-items:center;justify-content:space-between;background:var(--card);padding:14px 16px;border-radius:var(--radius);margin-bottom:8px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.setting-row .label{font-size:14px}
+.setting-row .hint{font-size:12px;color:var(--text2);margin-top:2px}
+.toggle{position:relative;width:48px;height:28px;background:var(--border);border-radius:14px;cursor:pointer;transition:.2s;flex-shrink:0}
+.toggle.on{background:var(--primary)}
+.toggle .knob{position:absolute;top:3px;left:3px;width:22px;height:22px;background:#fff;border-radius:50%;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.toggle.on .knob{left:23px}
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#323232;color:#fff;padding:10px 24px;border-radius:24px;font-size:14px;z-index:100;opacity:0;transition:.3s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1}
+@media(max-width:400px){.q-text{font-size:15px}.option{font-size:13px;padding:10px 12px}}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <div class="header">
+    <h1>📗 一建市政题库</h1>
+    <span class="badge" id="totalBadge">26版教材</span>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="home">🏠 首页</button>
+    <button class="tab" data-tab="practice">📝 练习</button>
+    <button class="tab" data-tab="wrong">❌ 错题</button>
+    <button class="tab" data-tab="settings">⚙️ 设置</button>
+  </div>
+
+  <div class="panel active" id="panel-home">
+    <div class="stats-grid" id="statsGrid">
+      <div class="stat-card"><div class="num" id="statTotal">0</div><div class="label">总题数</div></div>
+      <div class="stat-card green"><div class="num" id="statDone">0</div><div class="label">已练习</div></div>
+      <div class="stat-card orange"><div class="num" id="statRate">0%</div><div class="label">正确率</div></div>
+      <div class="stat-card red"><div class="num" id="statWrong">0</div><div class="label">错题数</div></div>
+    </div>
+    <div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:8px">快速开始</div>
+    <div class="quick-actions">
+      <button class="qa-btn" onclick="startRandom()"><span class="icon">🎲</span>随机 <span id="practiceCountDisplay">25</span> 题</button>
+      <button class="qa-btn" onclick="startWrongOnly()"><span class="icon">📕</span>错题重练</button>
+      <button class="qa-btn" onclick="startExam()"><span class="icon">⏱️</span>模拟考试</button>
+      <button class="qa-btn" onclick="startByChapter(-1)"><span class="icon">📚</span>章节选择</button>
+    </div>
+    <div style="font-size:13px;font-weight:600;color:var(--text2);margin:16px 0 8px">选择章节练习</div>
+    <div class="chapter-grid" id="chapterGrid"></div>
+  </div>
+
+  <div class="panel" id="panel-practice">
+    <div class="top-bar">
+      <button class="back-btn" onclick="backToHome()">←</button>
+      <div class="title" id="practiceTitle">练习模式</div>
+      <div class="info" id="progressInfo">1/25</div>
+    </div>
+    <div class="progress-bar"><div class="fill" id="progressFill" style="width:0%"></div></div>
+    <div id="questionArea"></div>
+  </div>
+
+  <div class="panel" id="panel-wrong">
+    <div id="wrongList"></div>
+    <div id="wrongEmpty" class="empty" style="display:none"><div class="icon">🎉</div><div style="font-size:16px;font-weight:600;margin-bottom:6px">没有错题</div><div style="font-size:13px;color:var(--text2)">继续保持！</div></div>
+  </div>
+
+  <div class="panel" id="panel-settings">
+    <div class="setting-row">
+      <div><div class="label">📖 显示解析</div><div class="hint">答题后立即显示答案解析</div></div>
+      <div class="toggle on" id="toggleShowAnswer" onclick="toggleSetting('showAnswer')"><div class="knob"></div></div>
+    </div>
+    <div class="setting-row">
+      <div><div class="label">🔀 选项随机</div><div class="hint">每题选项随机排序</div></div>
+      <div class="toggle" id="toggleShuffleOpts" onclick="toggleSetting('shuffleOpts')"><div class="knob"></div></div>
+    </div>
+    <div class="setting-row">
+      <div><div class="label">⏱️ 模拟考试时长</div><div class="hint">模拟考试限时（分钟）</div></div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <button onclick="adjExamTime(-5)" style="width:32px;height:32px;border-radius:50%;border:2px solid var(--border);background:none;font-size:18px;cursor:pointer">−</button>
+        <span id="examTimeDisplay" style="font-size:16px;font-weight:600;min-width:32px;text-align:center">30</span>
+        <button onclick="adjExamTime(5)" style="width:32px;height:32px;border-radius:50%;border:2px solid var(--border);background:none;font-size:18px;cursor:pointer">+</button>
+      </div>
+    </div>
+    <div class="setting-row">
+      <div><div class="label">🎲 随机练习题数</div><div class="hint">每次随机练习的题目数量（5~90题）</div></div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <button onclick="adjPracticeCount(-5)" style="width:32px;height:32px;border-radius:50%;border:2px solid var(--border);background:none;font-size:18px;cursor:pointer">−</button>
+        <span id="practiceCountSetting" style="font-size:16px;font-weight:600;min-width:32px;text-align:center">25</span>
+        <button onclick="adjPracticeCount(5)" style="width:32px;height:32px;border-radius:50%;border:2px solid var(--border);background:none;font-size:18px;cursor:pointer">+</button>
+      </div>
+    </div>
+
+    <div id="updatePanel" style="margin-top:20px;padding:16px;background:var(--card);border-radius:var(--radius);box-shadow:0 1px 3px rgba(0,0,0,.06)">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div>
+          <div style="font-size:14px;font-weight:600">📦 版本更新</div>
+          <div style="font-size:12px;color:var(--text2);margin-top:2px">当前版本：<span id="versionDisplay">v1.1.0</span></div>
+        </div>
+        <button id="checkUpdateBtn" onclick="checkUpdate()" style="padding:8px 16px;border-radius:8px;border:none;background:var(--primary);color:#fff;font-size:13px;font-weight:500;cursor:pointer">🔄 检查更新</button>
+      </div>
+      <div id="updateStatus" style="font-size:13px;min-height:20px"></div>
+    </div>
+
+    <div style="margin-top:16px">
+      <button onclick="clearAllProgress()" style="width:100%;padding:12px;border-radius:10px;border:2px solid var(--danger);background:#fff;color:var(--danger);font-size:14px;font-weight:600;cursor:pointer">🗑️ 清除所有进度</button>
+    </div>
+    <div style="margin-top:20px;text-align:center;font-size:12px;color:var(--text2);line-height:1.8">
+      依据：2026版全国一级建造师执业资格考试用书<br>
+      《市政公用工程管理与实务》<br>
+      ISBN 978-7-112-31913-8<br>
+      中国建筑工业出版社
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+</div>
+<script>
+const QUESTIONS = [
+  {id:1, ch:1, type:'single', q:'关于城镇道路路基压实前试验段的目的，下列哪项不属于试验目的？', opts:['确定路基预沉量值', '合理选用压实机具', '按压实度要求，确定压实遍数', '确定路基最佳含水率'], ans:3, exp:'教材原文：路基压实试验段的目的包括确定路基预沉量值、合理选用压实机具、按压实度要求确定压实遍数、确定路基宽度内每层虚铺厚度以及选择压实方式。而\'确定路基最佳含水率\'是土工试验确定的参数，不属于试验段目的。'},
+  {id:2, ch:1, type:'single', q:'土质路基压实应遵循的原则是？', opts:['先重后轻、先振后静、先高后低、先快后慢', '先轻后重、先静后振、先低后高、先慢后快', '先轻后重、先振后静、先高后低、先快后慢', '先重后轻、先静后振、先低后高、先慢后快'], ans:1, exp:'教材原文：土质路基压实应遵循的原则为\'先轻后重、先静后振、先低后高、先慢后快，轮迹重叠\'。四个\'先\'字是口诀的核心，旨在由轻到重逐步增加压实功，保证压实质量。'},
+  {id:3, ch:1, type:'single', q:'路基碾压时，压路机最快速度不宜超过？', opts:['3km/h', '4km/h', '5km/h', '6km/h'], ans:1, exp:'教材原文：压路机最快速度不宜超过4km/h。这是路基压实时对压路机行驶速度的硬性规定，速度过快会导致压实效果不均匀、压实度不足。'},
+  {id:4, ch:1, type:'single', q:'当管道结构顶面至路床的覆土厚度为50~80cm时，路基压实时应如何处理？', opts:['无需特殊处理', '对管道结构进行加固', '对管道结构采取保护或加固措施', '直接拆除管道'], ans:2, exp:'教材原文：当管道结构顶面至路床的覆土厚度在50~80cm时，路基压实时应对管道结构采取保护或加固措施。注意覆土不大于50cm时需加固，50~80cm时采取保护或加固。'},
+  {id:5, ch:1, type:'single', q:'密级配沥青混凝土混合料复压宜优先采用哪种压路机？', opts:['振动压路机', '重型轮胎压路机', '双轮钢筒式压路机', '三轮钢筒式压路机'], ans:1, exp:'教材原文：密级配沥青混凝土混合料复压宜优先采用重型轮胎压路机进行碾压，以增加密实性，其总质量不宜小于25t。轮胎压路机通过揉搓作用使混合料更加密实。'},
+  {id:6, ch:1, type:'single', q:'沥青混合料摊铺碾压过程中，为防止粘轮，对压路机钢轮应如何处理？', opts:['刷柴油', '涂刷隔离剂或防粘结剂，严禁刷柴油', '刷水即可', '不采取任何措施'], ans:1, exp:'教材原文：碾压时涂刷隔离剂或防粘结剂，严禁刷柴油。柴油会腐蚀软化沥青路面，破坏沥青与集料的粘结，属于违规操作。'},
+  {id:7, ch:1, type:'single', q:'热拌沥青混合料摊铺后，表面温度低于多少度方可开放交通？', opts:['40℃', '50℃', '60℃', '70℃'], ans:1, exp:'教材原文：热拌沥青混合料路面需待表面温度低于50℃后方可开放交通。这是为了防止路面在未充分冷却时因车辆荷载产生车辙、推移等变形。'},
+  {id:8, ch:1, type:'single', q:'碾压不到的部位应采用小型夯压机夯实，要求夯击面积重叠多少？', opts:['1/5~1/4', '1/4~1/3', '1/3~1/2', '1/2~2/3'], ans:1, exp:'教材原文：碾压不到的部位应采用小型夯压机夯实，防止漏夯，要求夯击面积重叠1/4~1/3。重叠夯击确保碾压边角部位密实度满足要求。'},
+  {id:9, ch:1, type:'single', q:'路基范围内管道结构顶面至路床覆土厚度不大于多少时，应对管道结构进行加固？', opts:['30cm', '50cm', '80cm', '100cm'], ans:1, exp:'教材原文：当管道结构顶面至路床的覆土厚度不大于50cm时，应对管道结构进行加固。50cm是需加固的临界值，小于等于此值时管道直接承受施工荷载风险大。'},
+  {id:10, ch:1, type:'single', q:'降噪排水路面的面层结构组合中，上面层宜采用哪种混合料？', opts:['AC沥青混合料', 'SMA沥青混合料', 'OGFC沥青混合料', 'AM沥青混合料'], ans:2, exp:'教材原文：降噪排水路面的面层结构组合一般为：上面层采用OGFC沥青混合料（或PAC透水沥青混合料），中、下面层等采用密级配沥青混合料。OGFC空隙率18%~23%，具有排水降噪功能。'},
+  {id:11, ch:2, type:'single', q:'关于桥梁支座垫石施工，下列选项中正确的是？', opts:['墩台帽、盖梁上的支座垫石和挡块宜与墩台一次性浇筑', '垫石和支座安装前应标出纵横向中心十字线，就位后中心线应重合', '支座安装前垫石顶面应采用水泥净浆抹平', '矩形滑板支座可以反置安装'], ans:1, exp:'教材原文：墩台帽、盖梁上的支座垫石和挡块宜二次浇筑，确保其位置和高程准确。垫石和支座安装时应分别在垫石和支座上标出纵横向的中心十字线，就位后中心线应重合。'},
+  {id:12, ch:2, type:'single', q:'预应力混凝土连续梁合龙顺序一般为？', opts:['先中跨、后次跨、最后边跨', '先边跨、后次跨、最后中跨', '先次跨、后边跨、最后中跨', '先中跨、后边跨、最后次跨'], ans:1, exp:'教材原文：预应力混凝土连续梁合龙顺序一般是先边跨、后次跨、最后中跨。这是常规的合龙顺序，目的是使结构受力逐步过渡到连续体系，避免产生过大的附加应力。'},
+  {id:13, ch:2, type:'single', q:'预应力混凝土连续梁合龙段长度宜为？', opts:['1m', '2m', '3m', '4m'], ans:1, exp:'教材原文：合龙段的长度宜为2m。合龙段是连续梁由悬臂浇筑转为连续结构的关键施工工序，长度过小施工困难，过大则增加临时连接荷载。'},
+  {id:14, ch:2, type:'single', q:'合龙宜在一天中什么时间进行？', opts:['气温最高时', '气温最低时', '气温适中时', '任意时间'], ans:1, exp:'教材原文：合龙宜在一天中气温最低时进行。低温时梁体收缩，合龙段长度相对增大，合龙后随温度回升梁体膨胀受压，有利于改善结构受力状态。'},
+  {id:15, ch:2, type:'single', q:'挂篮施工、行走时的抗倾覆安全系数不得小于？', opts:['1.5', '2.0', '2.5', '3.0'], ans:1, exp:'教材原文：挂篮施工、行走时的抗倾覆安全系数不得小于2.0。挂篮属高空作业，安全系数要求较高，确保在施工和行走过程中不发生倾覆事故。'},
+  {id:16, ch:2, type:'single', q:'挂篮允许最大变形（包括吊带变形的总和）为？', opts:['10mm', '15mm', '20mm', '25mm'], ans:2, exp:'教材原文：挂篮允许最大变形（包括吊带变形的总和）为20mm。这是控制悬浇梁体线形的关键指标，变形过大会影响梁体标高和结构尺寸精度。'},
+  {id:17, ch:2, type:'single', q:'悬臂浇筑连续梁时，挂篮质量与梁段混凝土的质量比值应控制在？', opts:['0.2~0.4', '0.3~0.5', '0.4~0.6', '0.5~0.7'], ans:1, exp:'教材原文：挂篮质量与梁段混凝土的质量比值宜控制在0.3~0.5之间。挂篮过重会增大施工荷载和结构变形，过轻则刚度和稳定性可能不足。'},
+  {id:18, ch:2, type:'single', q:'挂篮组装后，应按设计荷载做什么试验？', opts:['静载试验', '载重试验', '动载试验', '疲劳试验'], ans:1, exp:'教材原文：挂篮组装后，应按设计荷载做载重试验，以检验挂篮的承载能力和安全性。载重试验是验证挂篮结构安全性的必要程序。'},
+  {id:19, ch:2, type:'single', q:'梁跨体系转换时，支座反力的调整应以什么为主？', opts:['反力控制', '高程控制', '位移控制', '应力控制'], ans:1, exp:'教材原文：梁跨体系转换时，支座反力的调整应以高程控制为主。体系转换后应进行支座反力调整以满足设计标高要求，确保结构受力合理。'},
+  {id:20, ch:2, type:'single', q:'合龙段的混凝土强度等级应如何处理？', opts:['与梁体相同', '宜提升一级', '降低一级', '不做要求'], ans:1, exp:'教材原文：合龙段的混凝土强度等级宜提升一级，以提高合龙段的整体性和抗裂性能。合龙段是连续梁施工的关键部位，承受较大的温度应力和收缩应力。'},
+  {id:21, ch:3, type:'single', q:'高压喷射注浆中，有效处理范围最大的是哪种方法？', opts:['单管法', '双管法', '三管法', '四管法'], ans:2, exp:'教材原文：高压喷射注浆按喷射介质及工艺不同分为单管法（喷射高压水泥浆液）、双管法（喷射高压水泥浆液和压缩空气）和三管法（喷射高压水流、压缩空气和水泥浆液）。三管法有效处理范围最大。'},
+  {id:22, ch:3, type:'single', q:'盾构始发是指利用反力架和什么管片将盾构推入地层？', opts:['正环管片', '负环管片', '零环管片', '标准管片'], ans:1, exp:'教材原文：盾构始发是指利用反力架和负环管片将盾构推入地层，开始掘进的施工过程。负环管片在盾构始发阶段为盾构推进提供反力。'},
+  {id:23, ch:3, type:'single', q:'盾构接收可分为常规接收、钢套筒接收和什么接收？', opts:['水平接收', '水中接收', '水（土）中接收', '竖井接收'], ans:2, exp:'教材原文：盾构接收可分为常规接收、钢套筒接收和水（土）中接收三种方式。钢套筒接收适用于水土压力较大或地层条件复杂的工况。'},
+  {id:24, ch:3, type:'single', q:'当盾构到达距接收工作井多少米时，应对盾构姿态进行测量和调整？', opts:['50m', '80m', '100m', '150m'], ans:2, exp:'教材原文：当盾构到达距接收工作井100m时，应对盾构姿态进行测量和调整，确保盾构以正确姿态进入接收井。'},
+  {id:25, ch:3, type:'single', q:'当盾构到达距接收工作井多少米内，应控制掘进速度和土仓压力？', opts:['5m', '10m', '15m', '20m'], ans:1, exp:'教材原文：当盾构到达距接收工作井10m内时，应控制掘进速度和土仓压力，减小对洞口土体的扰动，防止洞口塌方或涌水。'},
+  {id:26, ch:3, type:'single', q:'单管法高压喷射注浆喷射的介质是？', opts:['高压水泥浆液', '高压水泥浆液和压缩空气', '高压水流和水泥浆液', '高压水流、压缩空气和水泥浆液'], ans:0, exp:'教材原文：单管法高压喷射注浆仅喷射高压水泥浆液一种介质，通过高压浆液冲击破坏土体并与土体混合形成固结体。双管法增加了压缩空气，三管法则用高压水流和压缩空气辅助。'},
+  {id:27, ch:3, type:'single', q:'高压喷射注浆中，三管法喷射的介质不包括？', opts:['高压水流', '压缩空气', '高压水泥浆液', '高压蒸汽'], ans:3, exp:'教材原文：三管法高压喷射注浆喷射的介质包括高压水流、压缩空气和高压水泥浆液。高压蒸汽不是三管法的喷射介质。'},
+  {id:28, ch:3, type:'single', q:'地下工程防水的设计和施工应遵循的原则中，不包括下列哪项？', opts:['防', '排', '堵', '灌'], ans:3, exp:'教材原文：地下工程防水的设计和施工应遵循\'防、排、堵、截\'相结合的原则。\'灌\'不属于防水基本原则，灌浆是渗漏处理的一种技术手段。'},
+  {id:29, ch:3, type:'single', q:'防水层终凝后应立即进行保湿养护，养护温度不宜低于多少度？', opts:['3℃', '5℃', '10℃', '15℃'], ans:1, exp:'教材原文：防水层终凝后应立即进行保湿养护，养护温度不宜低于5℃。低温下防水材料水化反应缓慢，养护温度过低会影响防水层的强度和防水效果。'},
+  {id:30, ch:3, type:'single', q:'地下工程防水砂浆养护时间不宜少于？', opts:['7d', '10d', '14d', '28d'], ans:2, exp:'教材原文：地下工程防水砂浆养护时间不宜少于14d。足够的养护时间保证水泥砂浆充分水化，达到设计强度和密实度，确保防水效果。'},
+  {id:31, ch:4, type:'single', q:'水处理构筑物满水试验合格标准为钢筋混凝土结构水池渗水量不得超过？', opts:['1L/(m²·d)', '2L/(m²·d)', '3L/(m²·d)', '5L/(m²·d)'], ans:1, exp:'教材原文：水处理构筑物满水试验合格标准为：钢筋混凝土结构水池渗水量不得超过2L/(m²·d)，砖石砌体结构水池不得超过3L/(m²·d)。'},
+  {id:32, ch:4, type:'single', q:'需进行满水试验和气密性试验的池体，正确的顺序是？', opts:['同时进行', '先气密性试验后满水试验', '先满水试验后气密性试验', '任选其一'], ans:2, exp:'教材原文：需进行满水试验和气密性试验的池体（如消化池），应先进行满水试验，合格后再进行气密性试验。先试水确保结构不渗漏，再试气密性。'},
+  {id:33, ch:4, type:'single', q:'污水处理中，AAO工艺的"O"代表什么区域？', opts:['缺氧区', '厌氧区', '好氧区', '兼氧区'], ans:2, exp:'教材原文：AAO工艺即厌氧-缺氧-好氧活性污泥法。其中第一个\'A\'代表厌氧区、第二个\'A\'代表缺氧区、\'O\'代表好氧区。'},
+  {id:34, ch:4, type:'single', q:'传统活性污泥处理系统的核心处理单元是？', opts:['沉淀池', '曝气池', '二沉池', '污泥回流泵房'], ans:1, exp:'教材原文：传统活性污泥处理系统的核心处理单元是曝气池。在曝气池中，活性污泥微生物分解有机物，同时通过曝气提供溶解氧，完成有机物的去除。'},
+  {id:35, ch:4, type:'single', q:'污水处理中，有机物浓度一般用什么指标表示？', opts:['SS', 'BOD₅', 'pH', 'DO'], ans:1, exp:'教材原文：污水处理中有机物浓度常用BOD₅（五日生化需氧量）指标表示，反映水中可生物降解有机物的含量。COD（化学需氧量）也是常用指标。'},
+  {id:36, ch:5, type:'single', q:'压力管道水压试验前，球墨铸铁管（有水泥砂浆衬里）的浸泡时间要求为？', opts:['不少于12h', '不少于24h', '不少于48h', '不少于72h'], ans:1, exp:'教材原文：压力管道水压试验前，球墨铸铁管（有水泥砂浆衬里）的浸泡时间要求不少于24h。注水浸泡使管道接口和衬里充分湿润，保证试验结果的准确性。'},
+  {id:37, ch:5, type:'single', q:'内径不大于1000mm的现浇钢筋混凝土管渠水压试验前浸泡时间要求为？', opts:['不少于12h', '不少于24h', '不少于48h', '不少于72h'], ans:2, exp:'教材原文：内径不大于1000mm的现浇钢筋混凝土管渠水压试验前浸泡时间要求不少于48h。管径越小，内表面面积越大，需要更长时间充分浸润。'},
+  {id:38, ch:5, type:'single', q:'内径大于1000mm的现浇钢筋混凝土管渠水压试验前浸泡时间要求为？', opts:['不少于24h', '不少于48h', '不少于72h', '不少于96h'], ans:2, exp:'教材原文：内径大于1000mm的现浇钢筋混凝土管渠水压试验前浸泡时间要求不少于72h。大管径管壁厚度大，需要较长时间使管壁充分吸水饱和。'},
+  {id:39, ch:5, type:'single', q:'压力管道水压试验主试验阶段正确的步骤是？', opts:['停止注水补压，稳定30min后降至工作压力恒压15min', '停止注水补压，稳定15min后降至工作压力恒压30min', '停止注水补压，稳定15min后降至工作压力恒压15min', '停止注水补压，稳定30min后降至工作压力恒压30min'], ans:1, exp:'教材原文：压力管道水压试验主试验阶段步骤：停止注水补压，稳定15min后降至工作压力，在工作压力下恒压30min，检查无渗漏为合格。'},
+  {id:40, ch:5, type:'single', q:'大口径球墨铸铁管单口水压试验合格且设计无要求时，可如何处理？', opts:['免去预试验阶段直接进行主试验', '免去主试验阶段', '免去浸泡阶段', '免去全部试验'], ans:0, exp:'教材原文：大口径球墨铸铁管单口水压试验合格且设计无要求时，可免去预试验阶段直接进行主试验。单口试验已证明接口密封性，可简化整体试验流程。'},
+  {id:41, ch:5, type:'single', q:'供热管道强度试验压力为设计压力的多少倍？', opts:['1.25倍', '1.5倍', '2.0倍', '1.15倍'], ans:1, exp:'教材原文：供热管道强度试验压力为设计压力的1.5倍，且不得低于0.6MPa。强度试验检验管道的承压能力和焊接质量。'},
+  {id:42, ch:5, type:'single', q:'供热管道严密性试验压力为设计压力的多少倍？', opts:['1.25倍', '1.5倍', '2.0倍', '1.15倍'], ans:0, exp:'教材原文：供热管道严密性试验压力为设计压力的1.25倍，且不小于0.6MPa。严密性试验在强度试验合格后进行，检验管道接口和附件的密封性能。'},
+  {id:43, ch:5, type:'single', q:'供热管道强度试验压力不得小于多少？', opts:['0.4MPa', '0.6MPa', '0.8MPa', '1.0MPa'], ans:1, exp:'教材原文：供热管道强度试验压力不得小于0.6MPa。这是强度试验压力的最低限值，确保管道具有足够的安全裕度。'},
+  {id:44, ch:5, type:'single', q:'供热管道强度试验在试验压力下稳压多长时间？', opts:['10min', '15min', '30min', '60min'], ans:0, exp:'教材原文：供热管道强度试验在试验压力下稳压10min，检查无渗漏、无压降为合格。10min是检查管道承压能力的基本时间要求。'},
+  {id:45, ch:5, type:'single', q:'燃气管道安装完成后，应依次进行哪些工作？', opts:['强度试验→严密性试验→吹扫', '吹扫→强度试验→严密性试验', '吹扫→严密性试验→强度试验', '严密性试验→强度试验→吹扫'], ans:1, exp:'教材原文：燃气管道安装完成后，应依次进行吹扫→强度试验→严密性试验。先吹扫清除管道内杂物，再做强度试验检验承压能力，最后做严密性试验检验密封性。'},
+  {id:46, ch:5, type:'single', q:'设计压力大于多少的输配钢质管道水压试验介质应为清洁水？', opts:['0.4MPa', '0.6MPa', '0.8MPa', '1.0MPa'], ans:2, exp:'教材原文：设计压力大于0.8MPa的输配钢质管道水压试验介质应为清洁水。高压管道采用水压试验更为安全，气压试验存在较大风险。'},
+  {id:47, ch:5, type:'single', q:'闭气试验管道内气体压力达多少Pa时开始计时？', opts:['1000Pa', '1500Pa', '2000Pa', '2500Pa'], ans:2, exp:'教材原文：闭气试验管道内气体压力达2000Pa时开始计时。闭气试验通过检测规定时间内的压力降来判断管道密封性能。'},
+  {id:48, ch:5, type:'single', q:'闭气试验中，实测气体压力P至少为多少可判定合格？', opts:['≥1000Pa', '≥1500Pa', '≥2000Pa', '≥2500Pa'], ans:1, exp:'教材原文：闭气试验中实测气体压力P≥1500Pa可判定合格。这是闭气试验判定合格的最低压力标准。'},
+  {id:49, ch:5, type:'single', q:'排水管道严密性试验分为闭水试验和？', opts:['闭压试验', '闭气试验', '闭渗试验', '闭漏试验'], ans:1, exp:'教材原文：排水管道严密性试验分为闭水试验和闭气试验两种。闭水试验是最常用的方法，闭气试验适用于不便注水的情况。'},
+  {id:50, ch:5, type:'single', q:'一级管网严密性试验在试验压力下稳压多长时间？', opts:['30min', '1h', '2h', '4h'], ans:1, exp:'教材原文：供热管道一级管网严密性试验在试验压力下稳压1h，检查压降不大于0.05MPa为合格。一级管网输送距离长，稳压时间要求较长。'},
+  {id:51, ch:6, type:'single', q:'干线综合管廊宜采用什么方式建设？', opts:['单舱方式', '双舱方式', '独立分舱方式', '多舱合并'], ans:2, exp:'教材原文：干线综合管廊宜采用独立分舱方式建设。干线管廊收纳主干管线，管线种类多、规格大，独立分舱便于管线布置、维护管理及消防安全。'},
+  {id:52, ch:6, type:'single', q:'支线综合管廊宜采用什么方式建设？', opts:['独立分舱方式', '单舱或双舱方式', '三舱方式', '多舱方式'], ans:1, exp:'教材原文：支线综合管廊宜采用单舱或双舱方式建设。支线管廊收纳配给管线，管线种类相对较少，断面较小，单舱或双舱可满足使用需求。'},
+  {id:53, ch:6, type:'single', q:'综合管廊不包括下列哪项附属设施？', opts:['消防系统', '通风系统', '绿化系统', '排水系统'], ans:2, exp:'教材原文：综合管廊附属设施包括消防系统、通风系统、供电照明系统、监控报警系统、排水系统和标识系统。绿化系统不属于综合管廊附属设施。'},
+  {id:54, ch:7, type:'single', q:'生活垃圾填埋场封场工程施工前应根据什么编制封场工程施工组织设计？', opts:['施工合同', '设计文件', '监理要求', '业主指令'], ans:1, exp:'教材原文：封场工程施工前应根据设计文件编制封场工程施工组织设计，并应制定封场过程中事故应急救援预案。封场后应进行长期维护和监测。'},
+  {id:55, ch:8, type:'single', q:'海绵城市建设中，不属于源头减排设施的是？', opts:['下沉式绿地', '透水铺装', '污水处理厂', '雨水花园'], ans:2, exp:'教材原文：海绵城市源头减排设施包括下沉式绿地、透水铺装、雨水花园、植草沟、绿色屋顶等。污水处理厂属于末端集中处理设施，不属于源头减排设施。'},
+  {id:56, ch:9, type:'single', q:'当距直埋缆线多少米范围内必须采用人工开挖？', opts:['1m', '2m', '3m', '5m'], ans:1, exp:'教材原文：当距直埋缆线2m范围内必须采用人工开挖。2m是机械开挖的安全距离，防止机械损伤地下缆线。'},
+  {id:57, ch:10, type:'single', q:'施工测量前应依据哪些文件编制施工测量方案？', opts:['设计图纸和施工合同', '设计图纸、施工组织设计和施工方案', '施工合同和监理规划', '施工方案和投标文件'], ans:1, exp:'教材原文：施工测量前，应依据设计图纸、施工组织设计和施工方案，编制施工测量方案。施工测量方案是指导测量工作的技术文件。'},
+  {id:58, ch:11, type:'single', q:'当施工监测数据达到预警标准时，应首先向谁报告？', opts:['建设单位项目负责人', '施工单位项目负责人', '设计单位负责人', '监理单位专业工程师'], ans:1, exp:'教材原文：当施工监测数据达到预警标准时，应首先向施工单位项目负责人报告。项目负责人组织研判后采取相应处置措施。'},
+  {id:59, ch:12, type:'single', q:'建筑工程实行总承包的，工程质量由谁负责？', opts:['建设单位', '总承包单位', '分包单位', '监理单位'], ans:1, exp:'教材原文：建筑工程实行总承包的，工程质量由总承包单位负责。总承包单位对全部建设工程质量负责，分包单位对其分包工程的质量向总承包单位负责。'},
+  {id:60, ch:12, type:'single', q:'建筑工程总承包单位可以将承包工程中的部分工程发包给什么单位？', opts:['任何有资质的单位', '具有相应资质条件的分包单位', '建设单位指定的单位', '个人'], ans:1, exp:'教材原文：建筑工程总承包单位可以将承包工程中的部分工程发包给具有相应资质条件的分包单位。分包单位必须具备相应资质，不得转包或违法分包。'},
+  {id:61, ch:13, type:'single', q:'超过一定规模的危大工程中，开挖深度超过多少的基坑需组织专家论证？', opts:['3m（含3m）', '4m（含4m）', '5m（含5m）', '6m（含6m）'], ans:2, exp:'教材原文：超过一定规模的危大工程中，开挖深度超过5m（含5m）的基坑需组织专家论证。深度5m及以上属于深基坑工程，技术难度大、风险高。'},
+  {id:62, ch:13, type:'single', q:'超过一定规模的危大工程中，搭设高度多少及以上的混凝土模板支撑工程需专家论证？', opts:['6m', '8m', '10m', '12m'], ans:1, exp:'教材原文：超过一定规模的危大工程中，搭设高度8m及以上的混凝土模板支撑工程需专家论证。8m以上属高支模，存在较大坍塌风险。'},
+  {id:63, ch:13, type:'single', q:'超过一定规模的危大工程中，搭设跨度多少及以上的混凝土模板支撑工程需专家论证？', opts:['12m', '15m', '18m', '20m'], ans:2, exp:'教材原文：超过一定规模的危大工程中，搭设跨度18m及以上的混凝土模板支撑工程需专家论证。大跨度支撑体系受力复杂，需专家评审方案安全可靠性。'},
+  {id:64, ch:14, type:'single', q:'工程总承包单位对承包范围内工程的什么负总责？', opts:['工程质量', '工程进度', '安全生产', '工程投资'], ans:2, exp:'教材原文：工程总承包单位对承包范围内工程的安全生产负总责。工程总承包单位对项目的安全、质量、进度、造价全面负责。'},
+  {id:65, ch:14, type:'single', q:'工程总承包项目经理依法承担什么责任？', opts:['行政责任', '经济责任', '质量终身责任', '刑事责任'], ans:2, exp:'教材原文：工程总承包项目经理依法承担质量终身责任。项目经理在工程设计使用年限内对工程质量承担相应责任。'},
+  {id:66, ch:14, type:'single', q:'企业投资项目的工程总承包宜采用什么合同形式？', opts:['单价合同', '总价合同', '成本加酬金合同', '可调价合同'], ans:1, exp:'教材原文：企业投资项目的工程总承包宜采用总价合同形式。总价合同有利于投资控制，明确总承包单位的责任和风险。'},
+  {id:67, ch:14, type:'single', q:'工程总承包单位应当设立什么机构？', opts:['技术研发中心', '项目管理机构', '安全生产委员会', '质量管理部'], ans:1, exp:'教材原文：工程总承包单位应当设立项目管理机构，设置项目经理，配备相应管理人员。项目管理机构负责工程的计划、组织、协调和控制。'},
+  {id:68, ch:1, type:'single', q:'路基施工前先修筑试验段的主要目的不包括？', opts:['确定松铺厚度', '确定压实机具组合', '确定压实遍数', '确定沥青用量'], ans:3, exp:'教材原文：路基施工前修筑试验段的主要目的包括确定松铺厚度、压实机具组合、压实遍数及压实方式等。沥青用量属于沥青混合料配合比设计范畴，不属于路基试验段目的。'},
+  {id:69, ch:2, type:'single', q:'桥梁支座安装时，应分别在垫石和支座上标出什么线？', opts:['水平线', '中心十字线', '高程控制线', '基准线'], ans:1, exp:'教材原文：支座安装时，应分别在垫石和支座上标出纵横向的中心十字线，就位后两者的中心十字线对准。这样才能保证支座位置准确。'},
+  {id:70, ch:3, type:'single', q:'盾构始发流程中，安装始发基座后的下一步通常是？', opts:['安装反力架', '盾构组装调试', '安装洞门密封', '拼装负环管片'], ans:1, exp:'教材原文：盾构始发流程一般为：始发前工作井端头地层加固→安装盾构始发基座→安装反力架→安装洞门密封→拼装负环管片→盾构组装调试→始发掘进。安装始发基座后应安装反力架。'},
+  {id:71, ch:5, type:'single', q:'闭气试验适用于哪类管道的严密性试验？', opts:['金属管道的压力管道', '混凝土类的无压管道', '塑料类的压力管道', '所有类型的管道'], ans:1, exp:'教材原文：闭气试验适用于混凝土类的无压管道严密性试验。闭气试验主要针对排水管道，用于替代闭水试验，适用于地下水水位较高或水源缺乏的场合。'},
+  {id:72, ch:5, type:'single', q:'供热管道严密性试验中一级管网在试验压力下前后压降不大于多少为合格？', opts:['0.03MPa', '0.05MPa', '0.08MPa', '0.1MPa'], ans:1, exp:'教材原文：供热管道严密性试验中，一级管网在试验压力下前后压降不大于0.05MPa为合格。压降越小，管道系统的密封性能越好。'},
+  {id:73, ch:5, type:'single', q:'闭水试验渗水量的观测时间不得小于？', opts:['15min', '30min', '45min', '60min'], ans:1, exp:'教材原文：闭水试验渗水量的观测时间不得小于30min。这是保证渗水量测定数据可靠的最低观测时间要求。'},
+  {id:74, ch:5, type:'single', q:'排水管道闭气试验时，地下水位应低于管外底多少？', opts:['100mm', '150mm', '200mm', '300mm'], ans:1, exp:'教材原文：排水管道闭气试验时，地下水位应低于管外底150mm。地下水位过高时闭气试验结果受地下水影响不准确。'},
+  {id:75, ch:5, type:'single', q:'闭气试验的环境温度要求范围是？', opts:['-10~40℃', '-15~50℃', '-20~50℃', '0~40℃'], ans:1, exp:'教材原文：闭气试验的环境温度要求范围为-15~50℃。超出此温度范围会影响气体压力和管道材料的性能，导致试验结果失真。'},
+  {id:76, ch:4, type:'single', q:'水处理构筑物中圆柱形混凝土池体结构，池壁高度多少时宜采用整体浇筑？', opts:['6~10m', '12~18m', '15~20m', '8~12m'], ans:1, exp:'教材原文：圆柱形混凝土池体结构，池壁高度在12~18m时宜采用整体浇筑。整体浇筑可保证池壁的整体性和抗渗性，避免施工缝处渗漏风险。'},
+  {id:77, ch:2, type:'single', q:'支座安装后，对垫石上的预留螺栓孔应采用什么材料填充？', opts:['普通水泥砂浆', '微膨胀灌浆材料', '环氧树脂', '细石混凝土'], ans:1, exp:'教材原文：支座安装后，对垫石上的预留螺栓孔应采用微膨胀灌浆材料填充。微膨胀材料能保证填充密实且与孔壁紧密结合，避免产生缝隙。'},
+  {id:78, ch:2, type:'single', q:'支座安装前垫石顶面应采用什么抹平？', opts:['水泥净浆', '干硬性水泥砂浆', '环氧砂浆', '细石混凝土'], ans:1, exp:'教材原文：支座安装前垫石顶面应采用干硬性水泥砂浆抹平。干硬性水泥砂浆含水率低、收缩小，能保证垫石顶面平整且与支座底钢板紧密接触。'},
+  {id:79, ch:5, type:'single', q:'强度试验应在试验段内的管道什么施工前进行？', opts:['管道安装', '管道接口防腐、保温施工及设备安装', '沟槽回填', '管道冲洗'], ans:1, exp:'教材原文：强度试验应在试验段内的管道接口防腐、保温施工及设备安装前进行。若完成后试验不合格，返工将造成大量浪费，故试验应尽早进行。'},
+  {id:80, ch:5, type:'single', q:'严密性试验应在什么范围内完成后进行？', opts:['试验段管道安装', '试验范围内管道工程全部安装完成', '管道接口防腐完成', '沟槽回填完成'], ans:1, exp:'教材原文：严密性试验应在试验范围内管道工程全部安装完成后进行。严密性试验检验整个管道系统的密封性能，需在全部安装工程完成后进行。'},
+  {id:81, ch:5, type:'multi', q:'下列选项中，属于水压试验浸泡时间要求中不少于24h的管道类型有？（多选）', opts:['球墨铸铁管（有水泥砂浆衬里）', '钢管（有水泥砂浆衬里）', '化学建材管', '预应力钢筒混凝土管', '现浇钢筋混凝土管渠'], ans:[0, 1, 2], exp:'教材原文：水压试验浸泡时间要求不少于24h的管道类型包括：球墨铸铁管（有水泥砂浆衬里）、钢管（有水泥砂浆衬里）、化学建材管。预应力钢筒混凝土管需不少于48h，现浇钢筋混凝土管渠需48h以上。'},
+  {id:82, ch:1, type:'multi', q:'土质路基碾压应遵循的原则包括？（多选）', opts:['先轻后重', '先静后振', '先高后低', '先慢后快', '轮迹重叠'], ans:[0, 1, 3, 4], exp:'教材原文：土质路基碾压应遵循的原则：先轻后重、先静后振、先低后高、先慢后快、轮迹重叠。注意\'先高后低\'是错误的，应为\'先低后高\'，即从低处向高处碾压。'},
+  {id:83, ch:2, type:'multi', q:'预应力混凝土连续梁合龙施工中，下列表述正确的有？（多选）', opts:['合龙段长度宜为2m', '合龙宜在一天中气温最高时进行', '合龙段混凝土强度等级宜提升一级', '合龙前应按设计要求将两悬臂端临时连接', '合龙顺序为先边跨、后次跨、最后中跨'], ans:[0, 2, 3, 4], exp:'教材原文：预应力混凝土连续梁合龙施工要求：合龙段长度宜为2m；合龙宜在一天中气温最低时（不是最高时）进行；合龙段混凝土强度等级宜提升一级；合龙前应按设计要求将两悬臂端临时连接；合龙顺序为先边跨、后次跨、最后中跨。合龙应在气温最低时进行。'},
+  {id:84, ch:5, type:'multi', q:'排水管道严密性试验中，必须进行严密性试验的管道包括？（多选）', opts:['湿陷性黄土地区的雨水管道', '膨胀土地区的雨水管道', '污水管道', '流砂地区的雨水管道', '一般地区的雨水管道'], ans:[0, 1, 2, 3], exp:'教材原文：排水管道严密性试验中，必须进行严密性试验的管道包括污水管道、湿陷性黄土地区雨水管道、膨胀土地区雨水管道、流砂地区雨水管道。一般地区的雨水管道可不做严密性试验。'},
+  {id:85, ch:5, type:'multi', q:'关于供热管道强度试验与严密性试验，下列正确的有？（多选）', opts:['强度试验压力为1.5倍设计压力且不小于0.6MPa', '强度试验在试验压力下稳压10min', '严密性试验压力为设计压力的1.25倍且不小于0.6MPa', '一级管网严密性试验稳压1h', '严密性试验发现渗漏时可带压补焊'], ans:[0, 1, 2, 3], exp:'教材原文：供热管道强度试验压力为1.5倍设计压力且不小于0.6MPa，稳压10min；严密性试验压力为1.25倍设计压力且不小于0.6MPa，一级管网稳压1h。渗漏时禁止带压补焊，必须卸压后处理。'},
+  {id:86, ch:3, type:'multi', q:'高压喷射注浆的方法包括？（多选）', opts:['单管法', '双管法', '三管法', '四管法', '五管法'], ans:[0, 1, 2], exp:'教材原文：高压喷射注浆的方法包括单管法、双管法和三管法。四管法和五管法不属于教材规定的高压喷射注浆方法分类。'},
+  {id:87, ch:3, type:'multi', q:'盾构始发施工的主要内容有？（多选）', opts:['始发前工作井端头的地层加固', '安装盾构始发基座', '安装反力架', '安装洞门密封', '拼装负环管片'], ans:[0, 1, 2, 3, 4], exp:'教材原文：盾构始发施工的主要内容有：始发前工作井端头的地层加固、安装盾构始发基座、安装反力架、安装洞门密封、拼装负环管片。上述工序缺一不可。'},
+  {id:88, ch:2, type:'multi', q:'挂篮结构设计的主要参数要求正确的有？（多选）', opts:['挂篮质量与梁段质量比值控制在0.3~0.5', '允许最大变形为20mm', '施工行走时抗倾覆安全系数不小于2', '自锚固系统安全系数不小于1.5', '斜拉水平限位安全系数不小于2'], ans:[0, 1, 2, 4], exp:'教材原文：挂篮结构设计主要参数：挂篮质量与梁段质量比值控制在0.3~0.5；允许最大变形为20mm；施工行走时抗倾覆安全系数不小于2；自锚固系统安全系数不小于2；斜拉水平限位安全系数不小于2。自锚固系统安全系数不小于2，不是1.5。'},
+  {id:89, ch:14, type:'multi', q:'超过一定规模的危大工程中，模板工程及支撑体系需专家论证的情形包括？（多选）', opts:['搭设高度8m及以上', '搭设跨度18m及以上', '施工总荷载（设计值）15kN/m²及以上', '集中线荷载（设计值）20kN/m及以上', '搭设高度6m'], ans:[0, 1, 2, 3], exp:'教材原文：超过一定规模的危大工程中模板工程需专家论证的情形包括：搭设高度8m及以上、搭设跨度18m及以上、施工总荷载（设计值）15kN/m²及以上、集中线荷载（设计值）20kN/m及以上。搭设高度6m不达论证标准。'},
+  {id:90, ch:5, type:'multi', q:'燃气管道严密性试验压力要求正确的有？（多选）', opts:['低压管道严密性试验压力为设计压力且不小于5kPa', '中压及以上管道严密性试验压力为设计压力且不小于0.1MPa', '设计压力大于0.8MPa的管道试压应稳压30min检查', '严密性试验应在强度试验合格后进行', '聚乙烯管道应重新进行严密性试验'], ans:[0, 1, 2, 3, 4], exp:'教材原文：燃气管道严密性试验要求：低压管道试验压力为设计压力且不小于5kPa；中压及以上为设计压力且不小于0.1MPa；设计压力大于0.8MPa的管道应稳压30min检查；严密性试验应在强度试验合格后进行。'},
+  {id:91, ch:1, type:'single', q:'城镇道路路面结构自上而下包括？', opts:['面层—基层—垫层—路基', '面层—垫层—基层—路基', '路基—基层—垫层—面层', '面层—基层—路基—垫层'], ans:0, exp:'教材原文：道路结构自上而下包括路面结构层、路基。路面结构自下至上由垫层、基层、面层组成。综合而言，城镇道路路面结构自上而下为：面层→基层→垫层→路基。'},
+  {id:92, ch:1, type:'single', q:'城镇道路沥青路面垫层设置在什么位置？', opts:['面层与基层之间', '基层与路基之间', '面层以上', '路基以下'], ans:1, exp:'教材原文：垫层是介于基层和路基之间的层位，主要设置在温度和湿度状况不良的路段上，以改善路面结构的使用性能。'},
+  {id:93, ch:1, type:'single', q:'沥青路面中垫层的主要作用不包括以下哪项？', opts:['改善土基湿度', '改善土基温度', '直接承受行车荷载', '保证面层强度稳定性'], ans:2, exp:'教材原文：垫层的主要作用为改善土基的湿度和温度状况，保证面层和基层的强度稳定性和抗冻胀能力，扩散由基层传来的荷载应力。直接承受行车荷载是面层的作用，非垫层。'},
+  {id:94, ch:1, type:'single', q:'下列不属于沥青混合料按空隙率分类的是？', opts:['密级配', '半开级配', 'SMA', '开级配'], ans:2, exp:'教材原文：沥青混合料按空隙率大小分为密级配、半开级配、开级配三大类。SMA（沥青玛蹄脂碎石）属于密级配混合料的一种特殊结构类型，不是按空隙率分类的名称。'},
+  {id:95, ch:1, type:'single', q:'温拌沥青的生产温度比同等热拌沥青低多少？', opts:['10~20℃', '20~40℃', '30~50℃', '40~60℃'], ans:1, exp:'教材原文：温拌沥青是一种在比同等热拌沥青温度低20~40℃的温度下生产和施工的沥青。温拌技术可降低石油资源消耗，释放更少的CO₂。'},
+  {id:96, ch:1, type:'single', q:'路基施工应遵循"先地下后地上"的原则，主要是指？', opts:['先挖地下管线沟槽再填路基', '先完成路基范围内的地下管线再填路基', '先做地面以上结构再做路基', '先铺地下管道再浇筑路面'], ans:1, exp:'教材原文：路基施工应遵循\'先地下后地上\'的原则，即先完成路基范围内的地下管线再填筑路基，避免路基成型后再开挖破坏路基稳定性。'},
+  {id:97, ch:1, type:'single', q:'路基范围内管线、构筑物四周的沟槽宜选用什么回填？', opts:['粗砂', '细土', '碎石', '透水性材料'], ans:3, exp:'教材原文：路基范围内管线、构筑物四周的沟槽宜选用透水性材料回填。透水性材料有利于排水，防止积水浸泡影响路基稳定。'},
+  {id:98, ch:1, type:'single', q:'路基施工挖土时应如何开挖？', opts:['自下向上分层开挖', '自上向下分层开挖', '上下同时开挖', '任意方向开挖'], ans:1, exp:'教材原文：路基挖土时应自上向下分层开挖，严禁掏洞开挖。掏洞开挖易导致边坡坍塌，属于危险施工行为。'},
+  {id:99, ch:2, type:'single', q:'梁式桥在竖向荷载作用下，支座处主要产生什么反力？', opts:['水平推力', '竖向反力', '弯矩', '扭矩'], ans:1, exp:'教材原文：梁式桥是一种在竖向荷载作用下无水平反力的结构。由于外力（包括自重）的作用方向与承重结构的轴线接近垂直，支座处仅产生竖向反力。'},
+  {id:100, ch:2, type:'single', q:'下列桥梁体系中，主要承重结构以受压为主的是？', opts:['梁式桥', '拱式桥', '悬索桥', '刚架桥'], ans:1, exp:'教材原文：拱桥的承重结构以受压为主，通常用抗压能力强的圬工材料（砖、石、混凝土等）修建。拱式桥在竖向荷载作用下，桥墩或桥台承受水平推力。'},
+  {id:101, ch:2, type:'single', q:'在竖向荷载作用下，桥墩或桥台承受水平推力的桥型是？', opts:['简支梁桥', '拱式桥', '连续梁桥', '悬臂梁桥'], ans:1, exp:'教材原文：拱桥在竖向荷载作用下，桥墩或桥台承受水平推力。这是拱桥区别于梁式桥的主要受力特征，水平推力使拱圈以受压为主。'},
+  {id:102, ch:2, type:'single', q:'按多孔跨径总长分类，中桥的范围是？', opts:['30m<L≤100m', '100m<L≤1000m', 'L>1000m', '20m<L≤100m'], ans:0, exp:'教材原文：按桥梁多孔跨径总长分类，中桥的范围为30m<L≤100m。大桥为100m<L≤1000m，小桥为8m≤L≤30m。'},
+  {id:103, ch:2, type:'single', q:'桥面与低水位之间的高差称为？', opts:['桥梁高度', '桥下净空高度', '建筑高度', '容许建筑高度'], ans:0, exp:'教材原文：桥梁高度指桥面与低水位之间的高差，或指桥面与桥下线路路面之间的距离。这是桥梁的一个重要空间尺寸参数。'},
+  {id:104, ch:2, type:'single', q:'设计洪水位至桥跨结构最下缘之间的距离称为？', opts:['桥梁高度', '建筑高度', '桥下净空高度', '容许建筑高度'], ans:2, exp:'教材原文：桥下净空高度为设计洪水位至桥跨结构最下缘之间的距离。它保证洪水及漂浮物能安全通过，是通航和防洪的重要控制指标。'},
+  {id:105, ch:2, type:'single', q:'计算矢高与计算跨径之比称为？', opts:['矢跨比', '矢高比', '跨径比', '拱矢度'], ans:0, exp:'教材原文：矢跨比：计算矢高与计算跨径之比，也称拱矢度，它是反映拱桥受力特性的一个重要指标。矢跨比越大，拱的推力越大。'},
+  {id:106, ch:2, type:'single', q:'连续梁桥通常将几孔做成一联？', opts:['2~3孔', '3~5孔', '4~6孔', '5~7孔'], ans:1, exp:'教材原文：连续梁桥通常是将3~5孔做成一联，在一联内无桥面接缝，行车较为顺适。连续梁桥施工时可以先将主梁逐孔架设成简支梁然后连接成为连续梁。'},
+  {id:107, ch:2, type:'single', q:'下列哪项不是简支梁桥的特点？', opts:['各孔独立工作', '不受墩台变位影响', '大跨径桥常用简支梁', '构造简单'], ans:2, exp:'教材原文：简支梁桥各孔独立工作，不受墩台变位影响，构造简单，是中小跨径桥梁常用的结构形式。但简支梁桥跨径一般不宜过大，大跨径常用连续梁或悬臂梁等体系。'},
+  {id:108, ch:2, type:'single', q:'锤击沉桩宜用于哪种土层？', opts:['砂类土、粘性土', '砾石、风化岩', '软粘土、淤泥质土', '密实砂土'], ans:0, exp:'教材原文：锤击沉桩宜用于砂类土、粘性土。沉桩方式应根据土质条件选择，锤击沉桩适用于一般土质，在密实砂土或砾石中贯入困难。'},
+  {id:109, ch:3, type:'single', q:'盾构法隧道常用的管片类型不包括？', opts:['标准环+左右转弯环', '通用型管片', '现浇混凝土管片', '标准环+楔形环'], ans:2, exp:'教材原文：目前通常采用的管片类型有三种：标准环+左右转弯环组合、通用型管片（楔形管片）、楔形管片。现浇混凝土管片不属于预制装配式管片类型。'},
+  {id:110, ch:3, type:'single', q:'盾构施工中向衬砌背后注浆的主要目的不包括？', opts:['防止地层移动', '固定衬砌环位置', '提高隧道防水等级', '润滑管片外表面'], ans:3, exp:'教材原文：及时向衬砌背后的空隙注浆，可防止地层移动、固定衬砌环位置、提高隧道防水等级。\'润滑管片外表面\'不是注浆目的，注浆材料凝固后起充填和固定作用。'},
+  {id:111, ch:3, type:'single', q:'盾构施工监测中下列哪项属于必测项目？', opts:['岩土体深层水平位移', '施工区域地表隆沉', '管片结构应力', '分层竖向位移'], ans:1, exp:'教材原文：施工区域地表隆沉、沿线建（构）筑物和地下管线变形、隧道结构变形属于必测项目。岩土体深层水平位移属于选测项目，不是必测。'},
+  {id:112, ch:3, type:'single', q:'下列哪项不属于地下工程主体结构防水工程的内容？', opts:['结构自防水', '防水层', '排水沟', '施工缝处理'], ans:2, exp:'教材原文：地下工程主体结构防水工程的内容包括结构自防水、防水层、施工缝处理、变形缝处理等。排水沟属于辅助排水措施，不属于主体结构防水工程内容。'},
+  {id:113, ch:3, type:'single', q:'地下工程柔性防水层阴阳角部位加强层不应小于多少幅宽？', opts:['200mm', '300mm', '500mm', '800mm'], ans:2, exp:'教材原文：柔性防水层阴阳角部位加强层不应小于500mm幅宽。阴阳角部位应力集中，需要加强处理以防止防水层破损。'},
+  {id:114, ch:3, type:'single', q:'不同材料无法直接粘结过渡时应采用相容性介质搭接，搭接宽度不应小于？', opts:['100mm', '200mm', '300mm', '500mm'], ans:2, exp:'教材原文：不同材料无法直接粘结过渡时应采用相容性介质搭接，搭接宽度不应小于300mm。确保搭接处密封可靠，不发生渗漏。'},
+  {id:115, ch:3, type:'single', q:'水泥基渗透结晶防水涂料涂层终凝后应采用什么方法养护？', opts:['蓄水养护', '干湿交替养护', '保湿养护', '喷雾养护'], ans:1, exp:'教材原文：水泥基渗透结晶防水涂料涂层终凝后应采用干湿交替养护方法。干湿交替有利于活性化学物质向混凝土内部渗透，形成结晶堵塞孔隙。'},
+  {id:116, ch:3, type:'single', q:'水泥基渗透结晶防水涂料干撒法应在什么时候干撒完毕？', opts:['混凝土终凝后', '混凝土初凝前', '混凝土浇筑前', '混凝土硬化后'], ans:1, exp:'教材原文：水泥基渗透结晶防水涂料干撒法应在混凝土初凝前干撒完毕。初凝前混凝土表面仍处于塑性状态，有利于防水材料与基层结合。'},
+  {id:117, ch:3, type:'single', q:'墙体水平施工缝应留设在高出底板表面不小于多少的墙体上？', opts:['200mm', '250mm', '300mm', '400mm'], ans:2, exp:'教材原文：墙体水平施工缝应留设在高出底板表面不小于300mm的墙体上。此高度足以防止底板积水或杂物进入施工缝，确保防水效果。'},
+  {id:118, ch:3, type:'single', q:'施工缝处已浇筑混凝土的强度不应小于多少方可进行后续施工？', opts:['0.5MPa', '1.0MPa', '1.2MPa', '2.0MPa'], ans:2, exp:'教材原文：施工缝处已浇筑混凝土的强度不应小于1.2MPa方可进行后续施工。1.2MPa是混凝土达到一定强度后进行凿毛、清理等后续工序的基本要求。'},
+  {id:119, ch:3, type:'single', q:'遇水膨胀止水条搭接连接时搭接宽度不得小于？', opts:['20mm', '30mm', '40mm', '50mm'], ans:1, exp:'教材原文：遇水膨胀止水条搭接连接时搭接宽度不得小于30mm。搭接过小会导致遇水膨胀时接头松动，影响止水效果。'},
+  {id:120, ch:3, type:'single', q:'盾构法隧道衬砌主要采用什么形式？', opts:['现浇钢筋混凝土衬砌', '预制装配式衬砌', '喷射混凝土衬砌', '砌体衬砌'], ans:1, exp:'教材原文：盾构法隧道衬砌主要采用预制装配式衬砌（管片）。管片在工厂预制，现场拼装，具有质量可靠、施工速度快等优点。'},
+  {id:121, ch:4, type:'single', q:'水池满水试验中向池内注水应分几次进行？', opts:['1次', '2次', '3次', '4次'], ans:2, exp:'教材原文：向池内注水应分3次进行，每次注水为设计水深的1/3。分级注水使水池逐步适应水荷载，避免一次注满导致结构受力不均。'},
+  {id:122, ch:4, type:'single', q:'满水试验中每次注水为设计水深的多少？', opts:['1/2', '1/3', '1/4', '2/3'], ans:1, exp:'教材原文：满水试验中每次注水为设计水深的1/3。注水应分3次完成，每次间隔不小于24h。'},
+  {id:123, ch:4, type:'single', q:'注水时水位上升速度不宜大于？', opts:['1m/d', '2m/d', '3m/d', '4m/d'], ans:1, exp:'教材原文：注水时水位上升速度不宜大于2m/d。过快注水会使池内外水压力差过大，对结构不利，也影响渗水量测定的准确性。'},
+  {id:124, ch:4, type:'single', q:'相邻两次注水的间隔时间不应小于？', opts:['12h', '24h', '36h', '48h'], ans:1, exp:'教材原文：相邻两次注水的间隔时间不应小于24h。间隔时间让池壁充分适应水荷载，观察是否有渗漏，确保满水试验数据的准确性。'},
+  {id:125, ch:4, type:'single', q:'注水至设计水深多久后开始测读水位测针的初读数？', opts:['12h', '24h', '36h', '48h'], ans:1, exp:'教材原文：注水至设计水深24h后开始测读水位测针的初读数。静置24h使水温稳定、混凝土充分吸水，保证渗水量测定的准确性。'},
+  {id:126, ch:4, type:'single', q:'测读水位的初读数与末读数间隔时间应不少于？', opts:['12h', '24h', '36h', '48h'], ans:1, exp:'教材原文：每次注水宜测读24h的水位下降值，计算渗水量。24h是固定的测读间隔时间，确保渗水量数据的稳定性和可比性。'},
+  {id:127, ch:4, type:'single', q:'水位测针的读数精确度应达到？', opts:['1/5mm', '1/10mm', '1/20mm', '1mm'], ans:1, exp:'教材原文：水位测针的读数精确度应达1/10mm。高精度测针保证渗水量测定的准确性，满水试验对水位变化测量精度要求较高。'},
+  {id:128, ch:4, type:'single', q:'水池有盖时，满水试验中蒸发量应如何处理？', opts:['必须测定', '按标准值取用', '可忽略不计', '按最大可能值取用'], ans:2, exp:'教材原文：池体有盖时，蒸发量可忽略不计。池体无盖时，必须做蒸发量测定，扣除蒸发影响才能得到真实的渗水量。'},
+  {id:129, ch:4, type:'single', q:'污水的生物化学需氧量常用哪个代号表示？', opts:['COD', 'TOD', 'TOC', 'BOD₅'], ans:3, exp:'教材原文：生物化学需氧量常用BOD₅（Five-day Biochemical Oxygen Demand）表示，指在20℃条件下5天内微生物分解水中有机物所消耗的溶解氧量。'},
+  {id:130, ch:5, type:'single', q:'水压试验前试验管段所有敞口应如何处理？', opts:['敞开放气', '应封闭不得渗漏', '半封闭', '临时封堵即可'], ans:1, exp:'教材原文：水压试验前试验管段所有敞口应封闭，不得渗漏。敞口未封闭会导致试验时大量漏水，无法准确测定渗水量和压力值。'},
+  {id:131, ch:5, type:'single', q:'水压试验时试验管段不得含有下列哪项？', opts:['闸阀', '消火栓', '排气阀', '排水阀'], ans:1, exp:'教材原文：水压试验时试验管段不得含有消火栓。消火栓属于用水器具，不参与管道承压试验，应关闭或拆除隔离，以免影响试验结果。'},
+  {id:132, ch:5, type:'single', q:'水压试验注水时应从什么位置缓慢注入？', opts:['上游', '下游', '管段中间', '任意位置'], ans:1, exp:'教材原文：水压试验注水时应从下游缓慢注入。从下游注水有利于排出管道内空气，避免气囊影响试验效果。'},
+  {id:133, ch:5, type:'single', q:'注水时在试验管段上游管顶及高点应设置什么？', opts:['排水阀', '排气阀', '压力表', '安全阀'], ans:1, exp:'教材原文：注水时在试验管段上游管顶及高点应设置排气阀。排气阀用于排出管道内积存的空气，确保水压试验的真实性。'},
+  {id:134, ch:5, type:'single', q:'管道采用两种以上管材组合试验时如设计无要求应如何确定试验标准？', opts:['取平均标准', '按最严标准', '按最宽松标准', '由监理指定'], ans:1, exp:'教材原文：管道采用两种以上管材组合试验时如设计无要求应按最严标准确定试验标准。从严要求确保管道系统的整体安全性和可靠性。'},
+  {id:135, ch:5, type:'single', q:'闭水试验中试验水头计算，当上游设计水头不超过管顶内壁时以什么为准？', opts:['管顶内壁加2m', '管底加2m', '设计水头加2m', '上游井口高度'], ans:0, exp:'教材原文：闭水试验中试验水头计算：上游设计水头不超过管顶内壁时，试验水头以上游管顶内壁加2m计。'},
+  {id:136, ch:5, type:'single', q:'闭水试验中上游设计水头超过管顶内壁时试验水头以什么为准？', opts:['管顶内壁加2m', '上游设计水头加2m', '井口高度', '管底加2m'], ans:1, exp:'教材原文：闭水试验中上游设计水头超过管顶内壁时，试验水头以上游设计水头加2m计。确保试验水头高于实际运行水头。'},
+  {id:137, ch:5, type:'single', q:'燃气管道水平定向钻回拖前应进行什么试验？', opts:['严密性试验', '强度试验', '闭水试验', '通球试验'], ans:1, exp:'教材原文：燃气管道水平定向钻回拖前应进行强度试验，检验管道在回拖过程中的承压能力，确保管道在回拖受力后仍能安全运行。'},
+  {id:138, ch:5, type:'single', q:'供热管道水压试验应以什么作为试验介质？', opts:['压缩空气', '清洁水', '氮气', '蒸汽'], ans:1, exp:'教材原文：供热管道水压试验应以清洁水作为试验介质。水质应洁净，避免杂质堵塞阀门或影响试验结果。'},
+  {id:139, ch:6, type:'single', q:'综合管廊附属设施不包括下列哪项？', opts:['消防系统', '通风系统', '绿化系统', '标识系统'], ans:2, exp:'教材原文：综合管廊附属设施包括消防系统、通风系统、供电照明系统、监控报警系统、排水系统和标识系统。绿化系统不属于管廊附属设施。'},
+  {id:140, ch:6, type:'single', q:'下列哪项不属于综合管廊入廊管线？', opts:['雨水', '天然气', '高压输电塔', '通信'], ans:2, exp:'教材原文：综合管廊入廊管线包括雨水、污水、给水、天然气、热力、电力、通信等管线。高压输电塔属于地面构筑物，不属于入廊管线。'},
+  {id:141, ch:6, type:'single', q:'下列哪种管道不可纳入综合管廊？', opts:['雨水', '污水', '再生水', '放射性废弃物管道'], ans:3, exp:'教材原文：综合管廊可纳入的管线包括雨水、污水、天然气、热力、电力、通信、再生水等。放射性废弃物管道因安全风险极高，不可纳入综合管廊。'},
+  {id:142, ch:6, type:'single', q:'综合管廊干线管廊的断面形式通常是？', opts:['圆形', '矩形', '马蹄形', '椭圆形'], ans:1, exp:'教材原文：综合管廊的断面形式宜采用矩形断面。矩形断面空间利用率高，便于各类管线分层布置和人员通行维护。'},
+  {id:143, ch:6, type:'single', q:'缆线管廊的内部空间特点是什么？', opts:['可满足人员通行', '不满足人员正常通行要求', '可通行小型车辆', '仅能穿越管道'], ans:1, exp:'教材原文：缆线管廊的内部空间特点是不满足人员正常通行要求。缆线管廊断面尺寸较小，主要用于敷设电力、通信等缆线，不设人员通行通道。'},
+  {id:144, ch:6, type:'single', q:'综合管廊主体结构包括哪些类型？', opts:['现浇混凝土和预制拼装', '仅现浇混凝土', '仅预制拼装', '钢结构'], ans:0, exp:'教材原文：综合管廊主体结构类型包括现浇混凝土和预制拼装两种。现浇整体性好，预制拼装施工速度快，可根据工程条件选择。'},
+  {id:145, ch:6, type:'single', q:'综合管廊天然气管道所在舱室的防火等级要求是？', opts:['一级', '二级', '三级', '与结构同等级'], ans:0, exp:'教材原文：综合管廊天然气管道所在舱室的防火等级应为一级。天然气属于甲类火灾危险性物质，防火要求最高。'},
+  {id:146, ch:7, type:'single', q:'生活垃圾填埋场基础层处理应满足什么要求？', opts:['压实度要求', '防渗要求', '渗滤液收集', '场地平整度'], ans:1, exp:'教材原文：生活垃圾填埋场基础层处理应满足防渗要求。防渗系统是防止渗滤液污染地下水的核心措施，基础层处理是防渗的基础。'},
+  {id:147, ch:7, type:'single', q:'生活垃圾焚烧厂烟气净化工艺不包括？', opts:['脱酸', '除尘', '脱硝', '脱盐'], ans:3, exp:'教材原文：生活垃圾焚烧厂烟气净化工艺主要包括脱酸、除尘、脱硝等。脱盐不属于垃圾焚烧烟气净化的常规工艺。'},
+  {id:148, ch:7, type:'single', q:'建筑垃圾资源化利用产品不包括？', opts:['再生骨料', '再生砖', '再生混凝土砌块', '再生塑料沥青'], ans:3, exp:'教材原文：建筑垃圾资源化利用产品包括再生骨料、再生砖、再生混凝土砌块等。再生塑料沥青不属于建筑垃圾资源化利用的典型产品。'},
+  {id:149, ch:7, type:'single', q:'生活垃圾填埋区防渗系统由什么组成？', opts:['基础层+防渗层+保护层', '仅防渗层', '仅基础层', '防渗层+排水层'], ans:0, exp:'教材原文：生活垃圾填埋区防渗系统由基础层、防渗层和保护层组成。防渗层一般采用HDPE膜，上下设保护层，共同构成完整的防渗系统。'},
+  {id:150, ch:8, type:'single', q:'下列哪项属于海绵城市建设的灰色设施？', opts:['下沉式绿地', '雨水花园', '调蓄池', '透水铺装'], ans:2, exp:'教材原文：海绵城市建设设施分为绿色设施和灰色设施。调蓄池属于灰色设施（传统工程设施）。下沉式绿地、雨水花园、透水铺装属于绿色设施（源头减排设施）。'},
+  {id:151, ch:8, type:'single', q:'海绵城市建设的核心原则不包括？', opts:['渗', '滞', '排', '净'], ans:2, exp:'教材原文：海绵城市的核心理念为\'渗、滞、蓄、净、用、排\'六字方针。\'排\'是六字之一，属于海绵城市建设的重要内容。'},
+  {id:152, ch:8, type:'single', q:'海绵城市建设技术措施不包括？', opts:['渗水铺装', '绿色屋顶', '污水处理厂扩建', '雨水花园'], ans:2, exp:'教材原文：海绵城市建设技术措施包括渗水铺装、绿色屋顶、雨水花园、下沉式绿地、植草沟、调蓄池等。污水处理厂扩建属于常规市政工程，不属于海绵城市专项技术措施。'},
+  {id:153, ch:8, type:'single', q:'生物滞留设施不包括以下哪项？', opts:['雨水花园', '下沉式绿地', '植草沟', '渗井'], ans:3, exp:'教材原文：生物滞留设施包括雨水花园、下沉式绿地、植草沟等。渗井属于渗透设施，不属于生物滞留设施，生物滞留设施强调植物和土壤的协同净化作用。'},
+  {id:154, ch:9, type:'single', q:'旧路改造加铺沥青面层时，为防止反射裂缝可采取什么措施？', opts:['增加面层厚度', '铺设土工合成材料', '提高沥青标号', '降低压实度'], ans:1, exp:'教材原文：旧路改造加铺沥青面层时，为防止反射裂缝可采取铺设土工合成材料的措施。土工合成材料如玻纤格栅可有效延缓旧路裂缝向上反射。'},
+  {id:155, ch:9, type:'single', q:'桥梁粘贴钢板加固法主要提高的是？', opts:['抗弯和抗剪能力', '抗扭能力', '抗震能力', '抗疲劳能力'], ans:0, exp:'教材原文：桥梁粘贴钢板加固法主要提高的是抗弯和抗剪能力。通过环氧树脂将钢板粘贴在梁体受拉区或剪力区，增加截面刚度和承载力。'},
+  {id:156, ch:9, type:'single', q:'旧管网改造时在距各类管道多少米范围内应人工开挖？', opts:['0.5m', '1m', '1.5m', '2m'], ans:1, exp:'教材原文：旧管网改造时在距各类管道1m范围内应人工开挖。1m是安全距离，防止机械开挖损坏既有管线。'},
+  {id:157, ch:9, type:'single', q:'在距直埋缆线多少米范围内必须采用人工开挖？', opts:['1m', '2m', '3m', '5m'], ans:1, exp:'教材原文：在距直埋缆线2m范围内必须采用人工开挖。机械开挖容易损坏缆线，2m范围内应采用人工开挖确保安全。'},
+  {id:158, ch:10, type:'single', q:'施工测量的基本原则是？', opts:['从整体到局部，先控制后碎部', '从局部到整体，先碎部后控制', '从点到面', '从面到点'], ans:0, exp:'教材原文：施工测量的基本原则是从整体到局部，先控制后碎部（先控制后细部）。先建立控制网再细部放样，保证测量精度和全局统一性。'},
+  {id:159, ch:10, type:'single', q:'施工测量常用的距离测量仪器不包括？', opts:['全站仪', '水准仪', 'GPS接收机', '回弹仪'], ans:3, exp:'教材原文：施工测量常用的距离测量仪器包括全站仪、水准仪、GPS接收机、钢尺等。回弹仪是检测混凝土强度的仪器，不属于距离测量仪器。'},
+  {id:160, ch:10, type:'single', q:'水准测量中消除视差的方法是？', opts:['调整目镜焦距', '重新调焦', '反复调节目镜和物镜调焦螺旋', '更换仪器'], ans:2, exp:'教材原文：水准测量中消除视差的方法是反复调节目镜和物镜调焦螺旋。使目标成像清晰且与十字丝平面重合，消除视差对读数的影响。'},
+  {id:161, ch:10, type:'single', q:'竣工测量应在什么阶段进行？', opts:['施工前', '施工中', '施工后验收前', '验收后'], ans:2, exp:'教材原文：竣工测量应在施工后、验收前进行。竣工测量成果是工程验收、运营管理和改扩建的重要依据。'},
+  {id:162, ch:11, type:'single', q:'基坑工程监测中下列哪项属于必测项目？', opts:['土压力', '桩墙内力', '地下水位', '支撑轴力'], ans:2, exp:'教材原文：基坑工程监测中必测项目包括基坑周边地表沉降、围护结构顶部水平位移、围护结构深层水平位移、支撑轴力、地下水位等。地下水位是必测项目之一。'},
+  {id:163, ch:11, type:'single', q:'监测数据达到预警标准时，应立即？', opts:['停止施工', '向施工单位项目负责人报告', '撤离人员', '启动应急预案'], ans:1, exp:'教材原文：监测数据达到预警标准时，应立即向施工单位项目负责人报告。项目负责人是施工现场的第一责任人，负责组织处置。'},
+  {id:164, ch:11, type:'single', q:'监测报告中不需要包含的内容是？', opts:['监测数据汇总', '施工预算', '变化趋势分析', '预警统计'], ans:1, exp:'教材原文：监测报告中应包含监测数据汇总、变化趋势分析、预警统计等内容。施工预算不属于监测报告的组成部分，属于成本管理范畴。'},
+  {id:165, ch:11, type:'single', q:'监测点布设应遵循什么原则？', opts:['越密越好', '重点部位加密', '均匀布设', '仅布设在边缘'], ans:1, exp:'教材原文：监测点布设应遵循重点部位加密的原则。关键受力部位、变形敏感区域应加密布点，确保获得全面准确的监测数据。'},
+  {id:166, ch:12, type:'single', q:'建筑工程实行总承包的，工程质量由谁负责？', opts:['建设单位', '总承包单位', '分包单位', '监理单位'], ans:1, exp:'教材原文：建筑工程实行总承包的，工程质量由总承包单位负责。总承包单位应对全部建设工程质量负责。'},
+  {id:167, ch:12, type:'single', q:'建筑工程总承包单位可以将部分工程分包给？', opts:['任何单位', '具有相应资质条件的分包单位', '建设单位指定单位', '个人'], ans:1, exp:'教材原文：建筑工程总承包单位可以将部分工程分包给具有相应资质条件的分包单位。分包须取得建设单位认可，且不得分包主体结构。'},
+  {id:168, ch:12, type:'single', q:'实行施工总承包的，施工现场安全生产由谁负责？', opts:['建设单位', '总承包单位', '分包单位', '监理单位'], ans:1, exp:'教材原文：实行施工总承包的，施工现场安全生产由总承包单位负责。总承包单位对施工现场的安全负总责，分包单位向总承包单位负责。'},
+  {id:169, ch:13, type:'single', q:'承重支撑体系承受单点集中荷载多少及以上需专家论证？', opts:['5kN', '7kN', '10kN', '15kN'], ans:1, exp:'教材原文：承重支撑体系承受单点集中荷载7kN及以上需专家论证。超过7kN的集中荷载对支撑体系局部承载能力要求高，需专项论证。'},
+  {id:170, ch:13, type:'single', q:'落地式钢管脚手架搭设高度多少及以上需专家论证？', opts:['30m', '40m', '50m', '60m'], ans:2, exp:'教材原文：落地式钢管脚手架搭设高度50m及以上需专家论证。超高层脚手架风荷载大、稳定性要求高，需专家评审方案。'},
+  {id:171, ch:14, type:'single', q:'施工组织设计中主要内容不包括？', opts:['施工部署', '施工方案', '施工预算', '施工进度计划'], ans:2, exp:'教材原文：施工组织设计中主要内容包括：工程概况、施工部署、施工方案、施工进度计划、资源配置计划、施工平面布置等。施工预算属于成本管理范畴，不属于施工组织设计主体内容。'},
+  {id:172, ch:14, type:'single', q:'危险性较大分部分项工程施工前应单独编制？', opts:['施工组织设计', '专项施工方案', '安全技术交底', '应急预案'], ans:1, exp:'教材原文：危险性较大分部分项工程施工前应单独编制专项施工方案。专项施工方案需经施工单位技术负责人审核和总监理工程师审查。'},
+  {id:173, ch:14, type:'single', q:'超过一定规模的危大工程专项方案由谁组织专家论证？', opts:['建设单位', '施工单位', '监理单位', '设计单位'], ans:1, exp:'教材原文：超过一定规模的危大工程专项方案由施工单位组织专家论证。施工单位是方案编制和论证的组织主体。'},
+  {id:174, ch:14, type:'single', q:'实行总承包的，超过一定规模危大工程专家论证会由谁组织召开？', opts:['建设单位', '施工总承包单位', '分包单位', '监理单位'], ans:1, exp:'教材原文：实行总承包的，超过一定规模危大工程专家论证会由施工总承包单位组织召开。总承包单位对危大工程的安全生产负总责。'},
+  {id:175, ch:14, type:'single', q:'安全生产管理方针是？', opts:['安全第一、预防为主', '安全第一、预防为主、综合治理', '安全第一、质量为本', '预防为主、防治结合'], ans:1, exp:'教材原文：安全生产管理方针是\'安全第一、预防为主、综合治理\'。这是我国安全生产工作的基本方针。'},
+  {id:176, ch:1, type:'single', q:'沥青路面中面层的主要作用是什么？', opts:['承受行车荷载', '改善路基湿度', '排水', '隔温'], ans:0, exp:'教材原文：面层直接承受汽车车轮的作用并直接受阳光、雨雪、冰冻等温度和湿度及其变化的作用，应具有足够的结构强度、高温稳定性、低温抗裂性及抗疲劳、抗水损害能力。承受行车荷载是面层的主要作用。'},
+  {id:177, ch:1, type:'single', q:'水泥混凝土路面中基层的作用不包括？', opts:['防止板底脱空', '改善接缝荷载传递', '直接承受车轮荷载', '为面层提供稳定基础'], ans:2, exp:'教材原文：水泥混凝土道路基层作用：防止或减轻由于唧泥导致的板底脱空和错台等病害；与垫层共同作用控制路基不均匀变形；为面层提供稳定基础并改善接缝荷载传递。直接承受车轮荷载是面层的作用。'},
+  {id:178, ch:1, type:'single', q:'路基压实中"先轻后重"的含义是？', opts:['先用轻型压路机后用重型压路机', '先压路基边缘后压中央', '先慢速后快速', '先静压后振动'], ans:0, exp:'教材原文：土质路基压实应遵循的原则为\'先轻后重...\'，即先用轻型压路机后用重型压路机。从轻到重逐步增加压实功，避免初期压实过重产生波浪或开裂。'},
+  {id:179, ch:1, type:'single', q:'路基碾压时应从什么位置开始？', opts:['路基中央向边缘', '路基边缘向中央', '任意方向', '从中间往两边'], ans:1, exp:'教材原文：碾压应从路基边缘向中央进行，压路机轮外缘距路基边应保持安全距离。从边缘向中间碾压有利于形成侧向约束，防止路基边缘坍塌。'},
+  {id:180, ch:1, type:'single', q:'路基填筑宜做成双向横坡，一般土质填筑横坡宜为？', opts:['1%~2%', '2%~3%', '3%~4%', '4%~5%'], ans:1, exp:'教材原文：路基填筑宜做成双向横坡，一般土质填筑横坡宜为2%~3%。横坡有利于排水，防止路面积水影响路基稳定。'},
+  {id:181, ch:2, type:'single', q:'振动沉桩宜用于哪种土层？', opts:['砂类土和粘性土', '密实粘性土、砾石、风化岩', '软粘土', '碎石土'], ans:1, exp:'教材原文：振动沉桩宜用于密实粘性土、砾石、风化岩。振动沉桩通过高频振动使土体液化或扰动减小阻力，适用于颗粒较粗的土层。'},
+  {id:182, ch:2, type:'single', q:'静力压桩宜用于哪种土层？', opts:['砂类土', '软粘土（标准贯入度N<20）', '碎石土', '风化岩'], ans:1, exp:'教材原文：静力压桩宜用于软粘土（标准贯入度N<20）。静压桩无噪声、无振动，适用于软土地层和对周边环境要求高的施工条件。'},
+  {id:183, ch:2, type:'single', q:'沉桩施工的贯入度应通过什么方式确定？', opts:['设计指定', '试桩后会同监理和设计单位确定', '施工单位经验', '规范直接规定'], ans:1, exp:'教材原文：沉桩施工的贯入度应通过试桩后会同监理和设计单位确定。贯入度是控制沉桩质量的关键参数，需根据试桩数据综合确定。'},
+  {id:184, ch:2, type:'single', q:'钻孔灌注桩施工时相邻两桩孔应如何处理？', opts:['同时施工', '间隔交错进行作业', '先一个完成再下一个', '左右对称施工'], ans:1, exp:'教材原文：钻孔灌注桩施工时相邻两桩孔应间隔交错进行作业。避免因相邻孔施工产生扰动影响孔壁稳定，即钻孔应等间隔施工。'},
+  {id:185, ch:2, type:'single', q:'钻孔灌注桩中护筒埋设的作用不包括？', opts:['固定桩位', '保护孔口', '防止塌孔', '提高桩端承载力'], ans:3, exp:'教材原文：护筒埋设的作用包括固定桩位、保护孔口、防止塌孔、隔离地面水等。\'提高桩端承载力\'属于桩端注浆等后续处理技术的作用，不是护筒的直接作用。'},
+  {id:186, ch:3, type:'single', q:'浅埋暗挖法"十八字方针"不包括？', opts:['管超前', '严注浆', '短开挖', '快回填'], ans:3, exp:'教材原文：喷锚暗挖法遵循\'管超前、严注浆、短开挖、强支护、快封闭、勤量测\'十八字方针。\'快回填\'不属于十八字方针，回填是明挖法的工序。'},
+  {id:187, ch:3, type:'single', q:'超前小导管注浆宜选用什么注浆材料？', opts:['水泥浆或水泥水玻璃浆', '环氧树脂', '沥青', '石灰浆'], ans:0, exp:'教材原文：超前小导管注浆宜选用水泥浆或水泥水玻璃浆。这类浆液凝结时间可调、强度较高，适合在隧道开挖前对前方围岩进行预支护和止水。'},
+  {id:188, ch:3, type:'single', q:'管棚施工中钢管内部宜填充什么以增加强度？', opts:['细砂', '水泥砂浆', '混凝土', '沥青'], ans:1, exp:'教材原文：管棚施工中钢管内部宜填充水泥砂浆以增加强度。水泥砂浆填充后提高了钢管的刚度和抗弯能力，增强管棚的支护效果。'},
+  {id:189, ch:3, type:'single', q:'马头门处隧道应密排几榀钢格栅？', opts:['两榀', '三榀', '四榀', '五榀'], ans:1, exp:'教材原文：马头门处隧道应密排三榀钢格栅，以加强马头门处的结构强度。马头门是隧道施工的关键部位，受力集中，需加强支护。'},
+  {id:190, ch:3, type:'single', q:'钻爆法隧道施工中常用的减震爆破措施是？', opts:['加大药量', '设置减震孔', '设置减震沟', '采用毫秒微差起爆'], ans:3, exp:'教材原文：钻爆法隧道施工中常用的减震爆破措施是采用毫秒微差起爆。通过分段延时起爆减小单段齐爆药量，降低爆破震动对周边围岩和建筑物的影响。'},
+  {id:191, ch:5, type:'single', q:'水压试验的试验管段长度不宜大于？', opts:['0.5km', '1.0km', '1.5km', '2.0km'], ans:1, exp:'教材原文：水压试验的试验管段长度不宜大于1.0km。管段过长会增加试验难度，发现问题后也不易定位和修复。'},
+  {id:192, ch:5, type:'single', q:'开槽施工管道水压试验前顶部回填高度不应小于？', opts:['0.3m', '0.5m', '0.8m', '1.0m'], ans:1, exp:'教材原文：开槽施工管道水压试验前顶部回填高度不应小于0.5m。适当回填可防止试验时管道位移，同时提供一定的约束力。'},
+  {id:193, ch:5, type:'single', q:'闭水试验管段的试验长度应按什么分隔？', opts:['按井距分隔带井试验', '按100m间距', '按施工段', '按管径'], ans:0, exp:'教材原文：闭水试验管段的试验长度应按井距分隔，带井试验。以检查井为分隔单元，便于试验操作和渗漏定位。'},
+  {id:194, ch:5, type:'single', q:'管道内径大于多少时闭水试验可按1/3抽样？', opts:['500mm', '700mm', '800mm', '1000mm'], ans:1, exp:'教材原文：管道内径大于700mm时闭水试验可按1/3抽样检验。大管径管道闭水试验难度较大，允许抽样检验以简化试验。'},
+  {id:195, ch:5, type:'single', q:'闭水试验抽样不合格时抽样井段数量应在原基础上如何调整？', opts:['增加1/3', '加倍', '增加1/2', '全部试验'], ans:1, exp:'教材原文：闭水试验抽样不合格时抽样井段数量应在原基础上加倍检验。加倍检验以确认渗漏问题是否为普遍存在，还是个别现象。'},
+  {id:196, ch:1, type:'multi', q:'路基压实试验段的目的包括？（多选）', opts:['确定路基预沉量值', '合理选用压实机具', '按压实度要求确定压实遍数', '确定路基宽度内每层虚铺厚度', '确定最佳沥青用量'], ans:[0, 1, 2, 3], exp:'教材原文：路基压实试验段的目的包括：确定路基预沉量值、合理选用压实机具、按压实度要求确定压实遍数、确定路基宽度内每层虚铺厚度、选择压实方式。确定沥青用量属于沥青混合料设计内容。'},
+  {id:197, ch:2, type:'multi', q:'钻孔灌注桩泥浆护壁成孔的钻进方式包括？（多选）', opts:['正循环回转钻', '反循环回转钻', '冲击钻', '旋挖钻', '人工挖孔'], ans:[0, 1, 2, 3], exp:'教材原文：教材指出：钻孔灌注桩泥浆护壁成孔的钻进方式包括正循环回转钻、反循环回转钻、冲击钻和旋挖钻。人工挖孔不属于泥浆护壁成孔方式。'},
+  {id:198, ch:4, type:'multi', q:'满水试验中下列表述正确的有？（多选）', opts:['向池内注水应分3次进行', '每次注水为设计水深的1/3', '注水速度不宜大于2m/d', '相邻两次注水间隔不小于12h', '注水至设计水深24h后开始测读初读数'], ans:[0, 1, 2, 4], exp:'教材原文：满水试验要求：向池内注水应分3次进行，每次注水为设计水深的1/3；注水速度不宜大于2m/d；相邻两次注水间隔不小于24h；注水至设计水深24h后开始测读初读数。选项"相邻两次注水间隔不小于12h"错误，应为24h。'},
+  {id:199, ch:14, type:'multi', q:'工程总承包单位的管理要求包括？（多选）', opts:['设立项目管理机构', '设置项目经理', '配备相应管理人员', '加强设计采购与施工协调', '保证所有施工都由总承包自行完成'], ans:[0, 1, 2, 3], exp:'教材原文：工程总承包单位的管理要求包括：设立项目管理机构、设置项目经理、配备相应管理人员、加强设计采购与施工协调。总承包可以将部分专业工程依法分包，并非所有施工都由总承包自行完成。'},
+  {id:200, ch:3, type:'multi', q:'盾构法隧道施工监测必测项目包括？（多选）', opts:['施工区域地表隆沉', '沿线建（构）筑物变形', '地下管线变形', '隧道结构变形', '岩土体深层水平位移'], ans:[0, 1, 2, 3], exp:'教材原文：根据教材盾构施工监测表格，必测项目包括：施工区域地表隆沉、沿线建（构）筑物变形、地下管线变形、隧道结构变形。岩土体深层水平位移属于选测项目。'},
+  {id:201, ch:1, type:'single', q:'城市快速路的设计年限，沥青路面为多少年？', opts:["10年", "15年", "20年", "30年"], ans:1, exp:'教材原文：快速路沥青路面设计年限为15年，水泥混凝土路面为30年。'},
+  {id:202, ch:1, type:'single', q:'城市支路采用砌块路面时，混凝土预制块的设计使用年限为多少年？', opts:["10年", "15年", "20年", "30年"], ans:0, exp:'教材原文：砌块路面采用混凝土预制块时，设计年限为10年；采用石材时为20年。'},
+  {id:203, ch:1, type:'single', q:'级配砾石用作次干路及其以下道路下基层时，最大粒径宜小于多少？', opts:["37.5mm", "53mm", "63mm", "75mm"], ans:1, exp:'教材原文：级配砾石用作次干路及其以下道路下基层时，级配中最大粒径宜小于53mm；用作上基层时最大粒径不应大于37.5mm。'},
+  {id:204, ch:1, type:'single', q:'级配砾石用作上基层时，最大粒径不应大于多少？', opts:["26.5mm", "31.5mm", "37.5mm", "53mm"], ans:2, exp:'教材原文：级配砾石用作上基层时，最大粒径不应大于37.5mm。'},
+  {id:205, ch:1, type:'single', q:'天然砂砾用作基层时，含泥量不应大于砂质量（粒径小于5mm）的多少？', opts:["5%", "10%", "15%", "20%"], ans:1, exp:'教材原文：天然砂砾应质地坚硬，含泥量不应大于砂质量（粒径小于5mm）的10%。'},
+  {id:206, ch:1, type:'single', q:'砾石颗粒中细长及扁平颗粒的含量不应超过多少？', opts:["10%", "15%", "20%", "25%"], ans:2, exp:'教材原文：砾石颗粒中细长及扁平颗粒的含量不应超过20%。'},
+  {id:207, ch:1, type:'single', q:'热拌沥青碎石（AM）的空隙率范围是？', opts:["3%~6%", "8%~15%", "18%~23%", "25%~30%"], ans:1, exp:'教材原文：热拌沥青碎石（AM）是一种半开级配混合料，空隙率8%~15%。'},
+  {id:208, ch:1, type:'single', q:'OGFC排水沥青混合料的空隙率范围是？', opts:["3%~6%", "8%~15%", "18%~23%", "25%~30%"], ans:2, exp:'教材原文：OGFC排水沥青混合料是一种开级配沥青混合料，空隙率18%~23%。'},
+  {id:209, ch:1, type:'single', q:'路基施工填土应分层进行，下层填土验收合格后，方可进行上层填筑，路基填土宽度每侧应比设计宽度多出多少？', opts:["200mm", "300mm", "500mm", "800mm"], ans:2, exp:'教材原文：路基填土宽度每侧应比设计宽度多出500mm，以保证路基边缘的压实度。具体数值在教材路基施工要点中有明确要求。'},
+  {id:210, ch:1, type:'single', q:'路基施工中，过街支管与检查井接合部应采取什么措施？', opts:["密封措施防止渗漏水", "加强焊接", "设置伸缩缝", "增加管道壁厚"], ans:0, exp:'教材原文：过街支管与检查井接合部应采取密封措施，防止渗漏水造成路面早期塌陷。'},
+  {id:211, ch:1, type:'single', q:'高液限粘土、高液限粉土及含有机质的细粒土，不适于做路基填料。因条件限制必须采用时，应掺加什么材料进行改善？', opts:["水泥或石灰", "沥青", "膨胀剂", "减水剂"], ans:0, exp:'教材原文：高液限粘土、高液限粉土及含有机质的细粒土，不适于做路基填料。因条件限制而必须采用上述土做填料时，应掺加石灰或水泥等结合料进行改善。'},
+  {id:212, ch:1, type:'single', q:'岩石或填石路基顶面应铺设整平层，其厚度一般为？', opts:["50~100mm", "100~150mm", "150~200mm", "200~250mm"], ans:1, exp:'教材原文：岩石或填石路基顶面应铺设整平层。整平层可采用未筛分碎石和石屑或低剂量水泥稳定粒料，其厚度视路基顶面不平整程度而定，一般为100~150mm。'},
+  {id:213, ch:1, type:'single', q:'水泥混凝土路面横向缩缝应加设传力杆，适用条件为？', opts:["快速路和主干路", "所有等级道路", "次干路及以下道路", "支路"], ans:0, exp:'教材原文：快速路、主干路的横向缩缝应加设传力杆；在邻近桥梁或其他固定构筑物处、板厚改变处等也应加设传力杆。'},
+  {id:214, ch:1, type:'single', q:'当路基处于过湿状态或强度与稳定性不符合要求的潮湿状态时，可设置什么来改善？', opts:["隔离层或采取疏干措施", "增加面层厚度", "设置排水沟", "加宽路基"], ans:0, exp:'教材原文：地下水位或地面积水水位较高，路基处于过湿状态或强度与稳定性不符合要求的潮湿状态时，可设置隔离层或采取疏干等措施。'},
+  {id:215, ch:2, type:'single', q:'桥梁按多孔跨径总长分类，特大桥的标准是？', opts:["L>1000m", "L≥500m", "L>100m", "L>150m"], ans:0, exp:'教材原文：按多孔跨径总长分类，特大桥：L>1000m。'},
+  {id:216, ch:2, type:'single', q:'桥梁按单孔跨径分类，大桥的标准是？', opts:["Lo≥40m", "Lo≥20m", "Lo≥100m", "Lo≥150m"], ans:0, exp:'教材原文：按单孔跨径长度分类，大桥：150≥Lo≥40。'},
+  {id:217, ch:2, type:'single', q:'按主要承重结构所用材料分类，不包括下列哪项？', opts:["圬工桥", "钢筋混凝土桥", "斜拉桥", "钢桥"], ans:2, exp:'教材原文：按主要承重结构所用的材料来分，有圬工桥、钢筋混凝土桥、预应力混凝土桥、钢桥、钢-混凝土组合梁桥和木桥等。斜拉桥是按受力特点分类的桥型。'},
+  {id:218, ch:2, type:'single', q:'拱式桥相比梁式桥的主要受力特征是什么？', opts:["以受弯为主", "以受剪为主", "以受压为主", "以受拉为主"], ans:2, exp:'教材原文：拱桥的承重结构以受压为主，通常用抗压能力强的圬工材料（砖、石、混凝土等）修建。'},
+  {id:219, ch:2, type:'single', q:'刚架桥的受力状态介于哪两种桥型之间？', opts:["梁桥和拱桥", "梁桥和悬索桥", "拱桥和悬索桥", "斜拉桥和梁桥"], ans:0, exp:'教材原文：刚架桥在竖向荷载作用下，梁部主要受弯，而在柱脚处也具有水平反力，其受力状态介于梁桥和拱桥之间。'},
+  {id:220, ch:2, type:'single', q:'悬索桥的主要缺点是什么？', opts:["施工困难", "结构重", "刚度差，变形和振动较大", "跨度小"], ans:2, exp:'教材原文：由于悬索桥的结构自重轻，刚度差，在车辆动荷载和风荷载作用下有较大的变形和振动。'},
+  {id:221, ch:2, type:'single', q:'桥梁按上部结构的行车道位置，桥面结构布置在主要承重结构之上的称为？', opts:["上承式桥", "下承式桥", "中承式桥", "组合式桥"], ans:0, exp:'教材原文：按上部结构的行车道位置分为上承式桥（桥面结构布置在主要承重结构之上）、下承式桥、中承式桥。'},
+  {id:222, ch:2, type:'single', q:'涵洞的定义是：多孔跨径全长不到多少米或单孔跨径不到多少米的泄水结构物？', opts:["8m和5m", "10m和8m", "6m和4m", "12m和10m"], ans:0, exp:'教材原文：凡是多孔跨径全长不到8m和单孔跨径不到5m的泄水结构物，均称为涵洞。'},
+  {id:223, ch:2, type:'single', q:'预应力混凝土连续梁桥通常将几孔做成一联？', opts:["2~3孔", "3~5孔", "4~6孔", "5~7孔"], ans:1, exp:'教材原文：连续梁桥通常是将3~5孔做成一联，在一联内无桥面接缝，行车较为顺适。'},
+  {id:224, ch:2, type:'single', q:'沉入桩施工中，射水沉桩宜用于哪种土层？', opts:["密实砂土", "软粘土", "粘性土", "碎石土"], ans:0, exp:'教材原文：射水沉桩宜用于密实砂土。通过高压水射流冲刷桩尖处土体以减少阻力，使桩在自重和锤击作用下沉入土中。'},
+  {id:225, ch:2, type:'single', q:'桥梁承台的作用是什么？', opts:["承受行车荷载", "承受、分布由墩身传递的荷载，联结各桩顶", "保护桥台", "连接桥跨结构"], ans:1, exp:'教材原文：承台为承受、分布由墩身传递的荷载，在桩基顶部设置的联结各桩顶的钢筋混凝土平台。'},
+  {id:226, ch:2, type:'single', q:'大体积混凝土施工应控制混凝土内外温差，一般不宜超过多少？', opts:["15℃", "20℃", "25℃", "30℃"], ans:2, exp:'教材原文：大体积混凝土施工要符合《城市桥梁工程施工与质量验收规范》CJJ 2-2008中7.10条的要求，控制混凝土内外温差不宜超过25℃。'},
+  {id:227, ch:2, type:'single', q:'挂篮的自锚固系统安全系数不得小于多少？', opts:["1.5", "2.0", "2.5", "3.0"], ans:1, exp:'教材原文：挂篮的自锚固系统安全系数不小于2；斜拉水平限位安全系数不小于2。'},
+  {id:228, ch:2, type:'multi', q:'桥梁由哪些基本部分组成？（多选）', opts:["上部结构", "下部结构", "支座系统", "附属设施", "桥头引道"], ans:[0, 1, 2, 3], exp:'教材原文：桥梁由上部结构、下部结构、支座系统和附属设施四个基本部分组成。桥头引道不属于桥梁基本组成部分。'},
+  {id:229, ch:2, type:'multi', q:'下列哪些属于桥梁附属设施？（多选）', opts:["桥面铺装", "排水防水系统", "栏杆", "伸缩缝", "承台"], ans:[0, 1, 2, 3], exp:'教材原文：附属设施包括桥面系（桥面铺装、防水排水系统、栏杆或防撞栏杆以及灯光照明等）、伸缩缝、桥头搭板和锥形护坡等。承台属于下部结构。'},
+  {id:230, ch:3, type:'single', q:'城市隧道施工方法中，从地表面向下开挖基坑至设计标高，在基坑内建造隧道主体结构的施工方法称为？', opts:["明挖法", "浅埋暗挖法", "钻爆法", "盾构法"], ans:0, exp:'教材原文：明挖法是从地表面向下开挖基坑至设计标高，然后在基坑内的预定位置由下而上建造隧道主体结构及其防水措施，最后回填土并恢复路面的施工方法。'},
+  {id:231, ch:3, type:'single', q:'浅埋暗挖法的"十八字方针"中不包括下列哪项？', opts:["管超前", "严注浆", "短开挖", "强封闭"], ans:3, exp:'教材原文：十八字方针为：管超前、严注浆、短开挖、强支护、快封闭、勤量测。\'强封闭\'应为\'快封闭\'。'},
+  {id:232, ch:3, type:'single', q:'TBM法是通过什么设备进行隧道施工的方法？', opts:["盾构机", "全断面岩石掘进机", "钻机", "锚杆机"], ans:1, exp:'教材原文：TBM法是通过全断面岩石掘进机（TBM）进行岩石破碎、出渣、支护，实现连续作业的一种施工方法。'},
+  {id:233, ch:3, type:'single', q:'盾构法目前已能适用于哪些水文地质条件？', opts:["仅软土", "仅硬岩", "软松或坚硬的、有地下水或无地下水的暗挖隧道", "仅无地下水地层"], ans:2, exp:'教材原文：盾构法已能适用于各种水文地质条件，无论是软松或坚硬的、有地下水或无地下水的暗挖隧道工程基本可以采用该工法施工。'},
+  {id:234, ch:3, type:'single', q:'地下工程防水系统应遵循的原则是？', opts:["防、排、堵、截", "防、排、截、灌", "防、截、堵、灌", "排、堵、截、灌"], ans:0, exp:'教材原文：地下工程防水的设计和施工应遵循\'防、排、堵、截\'相结合的原则。'},
+  {id:235, ch:3, type:'single', q:'墙体竖向施工缝应留设的位置是？', opts:["任意位置", "避开地下水较大的地段", "与水平施工缝平行", "底板与墙体的交接处"], ans:1, exp:'教材原文：墙体竖向施工缝应避开地下水和裂隙水较多的地段，并宜与变形缝相结合。'},
+  {id:236, ch:3, type:'single', q:'地下工程变形缝处止水带的中心应如何安装？', opts:["偏离变形缝中心", "与变形缝中心重合", "平行于变形缝", "垂直于变形缝"], ans:1, exp:'教材原文：变形缝处止水带应位置准确，其中心应与变形缝中心重合，确保止水效果。'},
+  {id:237, ch:3, type:'single', q:'锚喷暗挖法初期支护主要采用什么方式？', opts:["现浇混凝土", "钢筋格栅（或钢拱架）和喷锚混凝土", "预制管片", "砌体结构"], ans:1, exp:'教材原文：浅埋暗挖法以钢筋格栅（或钢拱架）和喷锚混凝土作为初期支护手段。'},
+  {id:238, ch:3, type:'single', q:'地下工程防水砂浆的养护温度不宜低于多少？', opts:["3℃", "5℃", "10℃", "15℃"], ans:1, exp:'教材原文：防水层终凝后应立即进行保湿养护，养护温度不宜低于5℃。防水砂浆养护时间不宜少于14d。'},
+  {id:239, ch:3, type:'multi', q:'城市隧道施工方法主要包括哪些？（多选）', opts:["明挖法", "浅埋暗挖法", "钻爆法", "盾构法", "TBM法"], ans:[0, 1, 2, 3, 4], exp:'教材原文：城市隧道施工方法主要包括：明挖法、浅埋暗挖法、钻爆法、盾构法、TBM法。'},
+  {id:240, ch:3, type:'multi', q:'喷锚暗挖法十八字方针包括？（多选）', opts:["管超前", "严注浆", "短开挖", "强支护", "快回填"], ans:[0, 1, 2, 3], exp:'教材原文：十八字方针为：管超前、严注浆、短开挖、强支护、快封闭、勤量测。\'快回填\'不是十八字方针的内容。'},
+  {id:241, ch:3, type:'single', q:'管棚施工中钢管的环向布设间距应根据什么确定？', opts:["地层条件和支护要求", "施工预算", "管径大小", "开挖方式"], ans:0, exp:'教材原文：管棚的环向布设间距应根据地层条件和支护要求确定，一般应保证管棚支护的连续性和整体性。'},
+  {id:242, ch:3, type:'single', q:'地下工程中，中埋式止水带的中心线应与什么重合？', opts:["施工缝中心", "变形缝中心", "结构中心线", "模板中心线"], ans:1, exp:'教材原文：中埋式止水带的中心线应与变形缝中心重合。止水带应位置准确，确保防水效果。'},
+  {id:243, ch:3, type:'single', q:'钻爆法隧道施工中，爆破后应立即进行什么工作？', opts:["出渣", "通风排烟", "支护", "测量"], ans:1, exp:'教材原文：钻爆法施工中，爆破后应立即进行通风排烟，排除爆破产生的有害气体和粉尘，保证作业人员的安全。'},
+  {id:244, ch:4, type:'single', q:'给水处理中，混凝沉淀的作用是去除什么？', opts:["粗大颗粒杂质", "胶体和悬浮杂质", "溶解性物质", "细菌"], ans:1, exp:'教材原文：混凝沉淀：使用混凝药剂沉淀或澄清去除水中胶体和悬浮杂质等。'},
+  {id:245, ch:4, type:'single', q:'给水处理中常用的消毒方法不包括？', opts:["加氯消毒", "臭氧消毒", "紫外消毒", "加热消毒"], ans:3, exp:'教材原文：常用消毒手段有加氯消毒、臭氧消毒和紫外消毒等。加热消毒不属于水厂常用的消毒方法。'},
+  {id:246, ch:4, type:'single', q:'给水处理中，除铁、除锰的常用方法是什么？', opts:["化学沉淀法和吸附交换法", "自然氧化法和接触氧化法", "离子交换法", "混凝沉淀法"], ans:1, exp:'教材原文：除铁、锰的常用方法有自然氧化法和接触氧化法。'},
+  {id:247, ch:4, type:'single', q:'给水预处理中，化学氧化法不包括下列哪项？', opts:["氯气预氧化", "高锰酸钾氧化", "臭氧氧化", "活性炭吸附"], ans:3, exp:'教材原文：化学氧化法预处理技术主要有氯气预氧化、高锰酸钾氧化、紫外光氧化以及臭氧氧化等预处理。活性炭吸附属于吸附预处理技术。'},
+  {id:248, ch:4, type:'single', q:'给水深度处理技术不包括下列哪项？', opts:["活性炭吸附法", "膜滤法", "光催化氧化法", "混凝沉淀法"], ans:3, exp:'教材原文：深度处理技术主要有活性炭（生物炭）吸附法、臭氧氧化法、膜滤法（超滤、纳滤）、光催化氧化法以及臭氧-活性炭联用法等。混凝沉淀属于常规处理工艺。'},
+  {id:249, ch:4, type:'single', q:'污水处理的一级处理主要针对什么？', opts:["溶解性有机物", "固体悬浮物质", "氮磷", "重金属"], ans:1, exp:'教材原文：一级处理主要针对水中固体悬浮物质，常采用物理处理的方法，经过一级处理后，污水中固体悬浮物可去除35%~60%。'},
+  {id:250, ch:4, type:'single', q:'城镇污水处理厂的核心是？', opts:["一级处理", "二级处理", "深度处理", "污泥处理"], ans:1, exp:'教材原文：二级处理是城镇污水处理厂的核心，主要去除污水中呈胶体和溶解状态的有机污染物质（以BOD或COD表示）。'},
+  {id:251, ch:4, type:'single', q:'污水二级处理后，BOD5和固体悬浮物的去除率可达？', opts:["50%~70%", "70%~85%", "85%~95%", "95%~99%"], ans:2, exp:'教材原文：经过二级处理后，污水中的BOD5、固体悬浮物去除率可达85%~95%，二沉池出水可实现达标排放。'},
+  {id:252, ch:4, type:'single', q:'AAO工艺中，第二个\'A\'代表什么区域？', opts:["厌氧区", "缺氧区", "好氧区", "兼氧区"], ans:1, exp:'教材原文：AAO工艺即厌氧-缺氧-好氧活性污泥法。第一个\'A\'代表厌氧区、第二个\'A\'代表缺氧区、\'O\'代表好氧区。'},
+  {id:253, ch:4, type:'single', q:'AAO工艺的处理效率中，总氮去除率一般为？', opts:["50%以上", "70%以上", "80%以上", "90%以上"], ans:1, exp:'教材原文：AAO工艺的处理效率通常能够实现90%~95%的BOD5和SS去除、70%以上的总氮去除以及90%左右的磷去除。'},
+  {id:254, ch:4, type:'single', q:'再生水回用中，城市绿化用水属于哪一类？', opts:["环境用水", "工业用水", "城市杂用水", "农业用水"], ans:2, exp:'教材原文：再生水回用分为五类，其中城市杂用水含城市绿化、冲厕、道路清扫、车辆冲洗、建筑施工、消防用水。'},
+  {id:255, ch:4, type:'single', q:'水池施工中，采用穿墙螺栓时，螺栓拆卸后混凝土壁面应留有锥形槽，深度应为？', opts:["20~30mm", "30~40mm", "40~50mm", "50~60mm"], ans:2, exp:'教材原文：螺栓拆卸后混凝土壁面应留有40~50mm深的锥形槽，应采用无收缩、易密实、具有足够强度的材料封堵。'},
+  {id:256, ch:4, type:'single', q:'水处理构筑物中，对跨度不小于多少的现浇钢筋混凝土梁、板，其模板应按设计要求起拱？', opts:["2m", "3m", "4m", "5m"], ans:2, exp:'教材原文：对跨度不小于4m的现浇钢筋混凝土梁、板，其模板应按设计要求起拱；设计无具体要求时，起拱高度宜为跨度的1/1000~3/1000。'},
+  {id:257, ch:4, type:'single', q:'大型矩形水池各块（单元）间留设后浇缝带，块（单元）养护多少天后才能灌注后浇缝带？', opts:["28d", "35d", "42d", "56d"], ans:2, exp:'教材原文：各块（单元）间留设后浇缝带，待块（单元）养护42d后，再采用比块（单元）高一个强度等级的混凝土灌注后浇缝带且养护时间不应低于14d。'},
+  {id:258, ch:5, type:'single', q:'水压试验中，试验管段长度不宜大于多少？', opts:["0.5km", "1.0km", "1.5km", "2.0km"], ans:1, exp:'教材原文：水压试验的试验管段长度不宜大于1.0km。'},
+  {id:259, ch:5, type:'single', q:'压力管道水压试验前浸泡时间，钢管（有水泥砂浆衬里）要求为？', opts:["不少于12h", "不少于24h", "不少于48h", "不少于72h"], ans:1, exp:'教材原文：水压试验浸泡时间要求不少于24h的管道类型包括：球墨铸铁管（有水泥砂浆衬里）、钢管（有水泥砂浆衬里）、化学建材管。'},
+  {id:260, ch:5, type:'single', q:'排水管道闭水试验中，管道内径大于多少时可按1/3抽样检验？', opts:["500mm", "600mm", "700mm", "800mm"], ans:2, exp:'教材原文：管道内径大于700mm时闭水试验可按1/3抽样检验。抽样不合格时应在原基础上加倍检验。'},
+  {id:261, ch:5, type:'single', q:'燃气管道设计压力不大于多少时，气压试验介质可为空气？', opts:["0.4MPa", "0.6MPa", "0.8MPa", "1.0MPa"], ans:1, exp:'教材原文：燃气管道设计压力不大于0.6MPa时，气压试验介质可为空气。设计压力大于0.8MPa的输配钢质管道水压试验介质应为清洁水。'},
+  {id:262, ch:5, type:'single', q:'供热管道严密性试验中，二级管网稳压多长时间？', opts:["30min", "1h", "2h", "4h"], ans:0, exp:'教材原文：供热管道二级管网严密性试验在试验压力下稳压30min，一级管网稳压1h。'},
+  {id:263, ch:5, type:'single', q:'给水排水管道功能性试验中，污水管道应进行什么试验？', opts:["闭水试验", "闭气试验", "水压试验", "强度试验"], ans:0, exp:'教材原文：污水管道、雨污水合流管道、湿陷性黄土地区及膨胀土地区的雨水管道必须进行严密性试验。污水管道应进行闭水试验。'},
+  {id:264, ch:5, type:'single', q:'燃气管道吹扫可采用什么方式？', opts:["压缩空气", "水", "蒸汽", "氮气"], ans:0, exp:'教材原文：燃气管道吹扫可采用压缩空气。吹扫的目的是清除管道内杂物，保证管道内部清洁。'},
+  {id:265, ch:5, type:'single', q:'水压试验注水时应在管段上游管顶及高点设置什么？', opts:["排气阀", "排水阀", "压力表", "安全阀"], ans:0, exp:'教材原文：注水时在试验管段上游管顶及高点应设置排气阀，以排除管道内空气。'},
+  {id:266, ch:5, type:'single', q:'管道水压试验前，管道接口防腐、保温施工及设备安装应在什么时候进行？', opts:["强度试验前", "强度试验后", "严密性试验后", "竣工验收后"], ans:0, exp:'教材原文：强度试验应在试验段内的管道接口防腐、保温施工及设备安装前进行。若完成后试验不合格，返工将造成大量浪费。'},
+  {id:267, ch:5, type:'single', q:'管道严密性试验应在什么时候进行？', opts:["管道安装完成后", "试验范围内管道工程全部安装完成后", "强度试验前", "回填土前"], ans:1, exp:'教材原文：严密性试验应在试验范围内管道工程全部安装完成后进行。'},
+  {id:268, ch:5, type:'multi', q:'压力管道水压试验前浸泡时间要求不少于48h的管道类型有？（多选）', opts:["预应力钢筒混凝土管", "现浇钢筋混凝土管渠（内径不大于1000mm）", "球墨铸铁管", "化学建材管", "钢管"], ans:[0, 1], exp:'教材原文：预应力钢筒混凝土管不少于48h；内径不大于1000mm的现浇钢筋混凝土管渠不少于48h。球墨铸铁管（有水泥砂浆衬里）和钢管（有水泥砂浆衬里）等不少于24h。'},
+  {id:269, ch:5, type:'multi', q:'燃气管道严密性试验中，关于试验压力的说法正确的有？（多选）', opts:["低压管道试验压力为设计压力且不小于5kPa", "中压及以上管道试验压力为设计压力且不小于0.1MPa", "设计压力大于0.8MPa的管道稳压30min", "试验压力不设下限", "严密性试验应在强度试验前进行"], ans:[0, 1, 2], exp:'教材原文：燃气管道严密性试验：低压管道试验压力为设计压力且不小于5kPa；中压及以上为设计压力且不小于0.1MPa；设计压力大于0.8MPa的管道应稳压30min检查。严密性试验应在强度试验合格后进行。'},
+  {id:270, ch:5, type:'single', q:'水平定向钻回拖前应对管道进行什么试验？', opts:["严密性试验", "强度试验", "闭水试验", "通球试验"], ans:1, exp:'教材原文：燃气管道水平定向钻回拖前应进行强度试验，检验管道在回拖过程中的承压能力。'},
+  {id:271, ch:5, type:'single', q:'供热管道水压试验的试验介质应采用？', opts:["压缩空气", "清洁水", "氮气", "蒸汽"], ans:1, exp:'教材原文：供热管道水压试验应以清洁水作为试验介质。水质应洁净。'},
+  {id:272, ch:5, type:'single', q:'开槽施工管道顶部回填高度在试验前不应小于多少？', opts:["0.3m", "0.5m", "0.8m", "1.0m"], ans:1, exp:'教材原文：开槽施工管道水压试验前顶部回填高度不应小于0.5m，以防止管道位移。'},
+  {id:273, ch:6, type:'single', q:'综合管廊的断面形式宜采用？', opts:["圆形", "矩形", "马蹄形", "椭圆形"], ans:1, exp:'教材原文：综合管廊的断面形式宜采用矩形断面，空间利用率高。'},
+  {id:274, ch:6, type:'single', q:'综合管廊的施工方法主要有哪两种？', opts:["明挖法和暗挖法", "现浇法和预制拼装法", "盾构法和顶管法", "钻爆法和矿山法"], ans:0, exp:'教材原文：综合管廊的施工方法有明挖法和暗挖法两大类。明挖法包括现浇和预制拼装；暗挖法包括盾构法和顶管法等。'},
+  {id:275, ch:6, type:'single', q:'综合管廊中纳入天然气管道的舱室，其防火等级应为？', opts:["一级", "二级", "三级", "四级"], ans:0, exp:'教材原文：综合管廊天然气管道所在舱室的防火等级应为一级，因为天然气属于甲类火灾危险性物质。'},
+  {id:276, ch:6, type:'single', q:'综合管廊的附属设施中，用于监控管廊内部环境安全的是？', opts:["消防系统", "通风系统", "监控报警系统", "标识系统"], ans:2, exp:'教材原文：综合管廊附属设施包括消防系统、通风系统、供电照明系统、监控报警系统、排水系统和标识系统。监控报警系统用于监测管廊内部的安全状况。'},
+  {id:277, ch:6, type:'single', q:'缆线管廊的主要功能是？', opts:["容纳各类市政管线", "容纳电力、通信等缆线", "人员通行维护", "行车通道"], ans:1, exp:'教材原文：缆线管廊主要用于敷设电力、通信等缆线，断面尺寸较小，不满足人员正常通行要求。'},
+  {id:278, ch:6, type:'single', q:'综合管廊的火灾自动报警系统在含有下列哪种管线的舱室必须设置？', opts:["电力电缆", "天然气管道", "给水管道", "热力管道"], ans:1, exp:'教材原文：综合管廊含有天然气管道的舱室必须设置火灾自动报警系统和可燃气体报警系统。'},
+  {id:279, ch:6, type:'single', q:'综合管廊内热力管道应使用的保温材料是？', opts:["岩棉", "玻璃棉", "不燃或难燃材料", "聚氨酯"], ans:2, exp:'教材原文：综合管廊内的热力管道应采用不燃或难燃材料进行保温，以确保消防安全。'},
+  {id:280, ch:6, type:'single', q:'综合管廊的预制拼装施工主要优点不包括？', opts:["施工速度快", "质量易控制", "整体性好", "现场湿作业少"], ans:2, exp:'教材原文：预制拼装施工具有施工速度快、质量易控制、现场湿作业少等优点。现浇混凝土整体性更好。'},
+  {id:281, ch:6, type:'single', q:'综合管廊排水系统的主要作用是？', opts:["排除管廊内积水", "排除入廊管线废水", "灌溉绿化", "消防用水"], ans:0, exp:'教材原文：综合管廊排水系统用于排除管廊内积水和管道渗漏水，保持管廊内部干燥。'},
+  {id:282, ch:6, type:'single', q:'综合管廊的投料口间距不宜大于？', opts:["200m", "300m", "400m", "500m"], ans:2, exp:'教材原文：综合管廊的投料口（进料口）设置间距不宜大于400m，方便管廊施工和后期管线敷设。'},
+  {id:283, ch:7, type:'single', q:'生活垃圾填埋场防渗系统中，HDPE膜焊接工艺包括双缝热熔焊接和什么？', opts:["单缝挤压焊接", "单缝热熔焊接", "双缝挤压焊接", "激光焊接"], ans:0, exp:'教材原文：HDPE膜焊接工艺包括双缝热熔焊接和单缝挤压焊接。单缝挤压焊接主要用于糙面膜之间的连接、各类修补和双轨热熔焊机无法焊接的部位。'},
+  {id:284, ch:7, type:'single', q:'膨润土防水毯施工时，搭接宽度为？', opts:["200±50mm", "250±50mm", "300±50mm", "350±50mm"], ans:1, exp:'教材原文：膨润土防水毯搭接宽度为(250±50)mm。'},
+  {id:285, ch:7, type:'single', q:'生活垃圾填埋场HDPE膜焊接前应对搭接部分进行什么处理？', opts:["涂刷粘结剂", "去除灰尘、污物，保持清洁干燥", "加温预热", "涂刷防水剂"], ans:1, exp:'教材原文：焊接前应去除灰尘、污物，使搭接部分保持清洁、干燥。焊接部位不得有划伤、污点、水分、灰尘以及其他妨碍焊接和影响施工质量的杂质。'},
+  {id:286, ch:7, type:'single', q:'膨润土防水毯铺设时应以什么形式分布？', opts:["一字形", "十字搭接", "品字形", "任意形式"], ans:2, exp:'教材原文：膨润土防水毯应以品字形分布，不得出现十字搭接。'},
+  {id:287, ch:7, type:'single', q:'钠基膨润土防水毯的体积膨胀度不应小于多少？', opts:["20mL/(2g)", "24mL/(2g)", "30mL/(2g)", "36mL/(2g)"], ans:1, exp:'教材原文：膨润土体积膨胀度不应小于24mL/(2g)。'},
+  {id:288, ch:7, type:'single', q:'钠基膨润土防水毯的抗拉强度不应小于？', opts:["600N/(10cm)", "800N/(10cm)", "1000N/(10cm)", "1200N/(10cm)"], ans:1, exp:'教材原文：钠基膨润土防水毯抗拉强度不应小于800N/(10cm)。'},
+  {id:289, ch:7, type:'single', q:'生活垃圾焚烧厂的烟气净化工艺中，脱酸的目的是去除什么？', opts:["颗粒物", "酸性气体", "氮氧化物", "重金属"], ans:1, exp:'教材原文：生活垃圾焚烧厂烟气净化工艺主要包括脱酸、除尘、脱硝等。脱酸用于去除烟气中的酸性气体（如HCl、SOx等）。'},
+  {id:290, ch:7, type:'single', q:'建筑垃圾资源化利用中，再生骨料可用于？', opts:["制备再生混凝土", "直接回填", "仅用于人行道", "仅用于绿化"], ans:0, exp:'教材原文：建筑垃圾资源化利用产品包括再生骨料、再生砖、再生混凝土砌块等。再生骨料可用于制备再生混凝土。'},
+  {id:291, ch:7, type:'single', q:'生活垃圾填埋场泥质防水层施工中，膨润土掺加量的确定方法为？', opts:["按规范指定", "通过多组配合土样对比分析优选出最佳配合比", "按经验值取5%", "按设计要求统一取值"], ans:1, exp:'教材原文：应在施工现场内选择土壤，通过对多组配合土样的对比分析，优选出最佳配合比，达到既能保证施工质量，又可节约工程造价的目的。'},
+  {id:292, ch:7, type:'single', q:'生活垃圾填埋场泥质防水层施工中，振动压路机碾压遍数应控制在？', opts:["2~4遍", "4~6遍", "6~8遍", "8~10遍"], ans:1, exp:'教材原文：振动压路机碾压控制在4~6遍，碾压密实。'},
+  {id:293, ch:8, type:'single', q:'海绵城市建设的核心理念六字方针中不包括哪项？', opts:["渗", "滞", "蓄", "排"], ans:3, exp:'教材原文：海绵城市的核心理念为\'渗、滞、蓄、净、用、排\'六字方针。\'排\'是六字之一。'},
+  {id:294, ch:8, type:'single', q:'下列哪项不属于海绵城市绿色基础设施？', opts:["下沉式绿地", "绿色屋顶", "调蓄池", "雨水花园"], ans:2, exp:'教材原文：海绵城市绿色设施包括下沉式绿地、绿色屋顶、雨水花园、透水铺装等。调蓄池属于灰色设施（传统工程设施）。'},
+  {id:295, ch:8, type:'single', q:'海绵城市建设中，植草沟的主要功能是？', opts:["调蓄雨水", "输送和净化径流雨水", "渗透雨水", "储存雨水"], ans:1, exp:'教材原文：植草沟是海绵城市常用的设施之一，主要功能是输送和净化径流雨水，属于生物滞留设施的一种。'},
+  {id:296, ch:8, type:'single', q:'下列哪项属于海绵城市的源头减排设施？', opts:["调蓄池", "污水处理厂", "透水铺装", "排水泵站"], ans:2, exp:'教材原文：海绵城市源头减排设施包括下沉式绿地、透水铺装、雨水花园、植草沟、绿色屋顶等。调蓄池属于中途或末端设施。'},
+  {id:297, ch:8, type:'single', q:'海绵城市建设中，下沉式绿地的下沉深度一般为？', opts:["50~100mm", "100~200mm", "200~300mm", "300~500mm"], ans:1, exp:'教材原文：下沉式绿地的下沉深度应根据设计调蓄容积确定，一般宜为100~200mm，便于雨水径流的滞留和入渗。'},
+  {id:298, ch:8, type:'single', q:'海绵城市渗排设施中，渗井的主要作用是？', opts:["收集和渗透雨水", "过滤雨水", "输送雨水", "储存雨水"], ans:0, exp:'教材原文：渗井属于海绵城市渗透设施，主要功能是收集和渗透雨水，将雨水补充到地下。'},
+  {id:299, ch:8, type:'single', q:'海绵城市建设工程中，生物滞留设施不包括下列哪项？', opts:["雨水花园", "下沉式绿地", "植草沟", "渗透塘"], ans:3, exp:'教材原文：生物滞留设施包括雨水花园、下沉式绿地、植草沟等。渗透塘属于渗透设施，不属于生物滞留设施。'},
+  {id:300, ch:8, type:'single', q:'海绵城市建设技术中，"渗"的主要目的是？', opts:["减少雨水径流", "储存雨水", "净化雨水", "利用雨水"], ans:0, exp:'教材原文：海绵城市六字方针中\'渗\'指通过源头减排设施让雨水渗透到地下，减少地表径流。'},
+  {id:301, ch:8, type:'single', q:'海绵城市"滞"的理念主要通过什么实现？', opts:["调蓄池", "下沉式绿地、植草沟等设施", "排水管网", "泵站"], ans:1, exp:'教材原文：\'滞\'主要通过建设下沉式绿地、植草沟、雨水花园等设施使雨水滞留，延缓径流峰值。'},
+  {id:302, ch:8, type:'single', q:'海绵城市"净"的主要作用是？', opts:["减少径流量", "降低洪峰流量", "净化雨水水质", "补充地下水"], ans:2, exp:'教材原文：\'净\'是通过植被、土壤等对雨水进行净化，去除径流中的污染物。'},
+  {id:303, ch:9, type:'single', q:'旧路改造加铺沥青面层时，加铺层的厚度应根据什么确定？', opts:["旧路强度和交通量", "施工条件", "材料供应", "设计院意见"], ans:0, exp:'教材原文：旧路改造加铺沥青面层时，加铺层的厚度应根据旧路强度、交通量以及使用要求等因素综合确定。'},
+  {id:304, ch:9, type:'single', q:'桥梁粘贴钢板加固时，钢板与混凝土之间的粘结材料一般采用？', opts:["水泥砂浆", "环氧树脂", "沥青", "石膏"], ans:1, exp:'教材原文：桥梁粘贴钢板加固法采用环氧树脂将钢板粘贴在梁体受拉区或剪力区，增加截面刚度和承载力。'},
+  {id:305, ch:9, type:'single', q:'旧管网改造施工中，在距各类管道多少米范围内应采用人工开挖？', opts:["0.5m", "1m", "1.5m", "2m"], ans:1, exp:'教材原文：旧管网改造时在距各类管道1m范围内应人工开挖，防止机械开挖损坏既有管线。'},
+  {id:306, ch:9, type:'single', q:'旧路改造中，为减少反射裂缝，可在旧路面上铺设什么材料？', opts:["防水卷材", "土工合成材料", "塑料薄膜", "钢板"], ans:1, exp:'教材原文：为防止反射裂缝可采取铺设土工合成材料的措施，如玻纤格栅可有效延缓旧路裂缝向上反射。'},
+  {id:307, ch:9, type:'single', q:'旧桥加固中，增大截面加固法主要提高的是？', opts:["构件刚度", "抗弯和抗剪能力", "抗震能力", "抗疲劳能力"], ans:0, exp:'教材原文：增大截面加固法是通过增加主梁截面面积和配筋来提高构件的刚度和承载力。与粘贴钢板法不同。'},
+  {id:308, ch:9, type:'single', q:'道路改造施工中的旧路处理，对沥青路面裂缝的处理方法不包括？', opts:["灌缝", "贴缝", "铣刨重铺", "直接加铺"], ans:3, exp:'教材原文：旧路改造对沥青路面裂缝的处理方法包括灌缝、贴缝、铣刨重铺等。\'直接加铺\'不能有效处理裂缝，会导致反射裂缝。'},
+  {id:309, ch:9, type:'single', q:'管网改造施工中，管道焊接接头应按设计要求进行什么检验？', opts:["外观检查", "无损检测", "压力试验", "以上都是"], ans:3, exp:'教材原文：管道焊接接头应按设计要求进行外观检查、无损检测和压力试验等检验，确保焊接质量。'},
+  {id:310, ch:9, type:'single', q:'旧桥改造中，桥面铺装层翻修时，应特别注意什么？', opts:["与旧结构的连接", "增加铺装厚度", "减少铺装厚度", "改变结构形式"], ans:0, exp:'教材原文：桥面铺装层翻修时，应特别注意新铺装层与旧结构之间的连接质量，确保新旧界面结合良好。'},
+  {id:311, ch:9, type:'single', q:'管道更新施工中，穿插衬管修复法主要适用于什么类型的管道？', opts:["压力管道", "重力管道", "各种管道", "仅燃气管道"], ans:0, exp:'教材原文：穿插衬管修复法适用于压力管道的修复，将新管（PE管等）穿入旧管内形成复合管道。'},
+  {id:312, ch:9, type:'single', q:'桥梁体外预应力加固法主要施加预应力在什么位置？', opts:["梁体内部", "梁体外部", "墩台上", "桥面上"], ans:1, exp:'教材原文：体外预应力加固法是在梁体外部（箱梁内或梁体外侧）布置预应力筋，通过张拉施加预应力来提高梁的承载力和抗裂性。'},
+  {id:313, ch:10, type:'single', q:'水准仪的主要功能是？', opts:["测量水平距离", "测量两点间的高差", "测量角度", "测量坐标"], ans:1, exp:'教材原文：水准仪用于测量两点间的高差，是水准测量中的主要仪器，也可用于建立水平视线。'},
+  {id:314, ch:10, type:'single', q:'全站仪可以同时测量什么？', opts:["角度和距离", "水平距离和高差", "角度和坐标", "距离和高程"], ans:0, exp:'教材原文：全站仪是一种集光、机、电为一体的测量仪器，可同时测量水平角、竖直角和斜距。'},
+  {id:315, ch:10, type:'single', q:'施工控制测量的目的是？', opts:["保证施工精度", "建立统一的平面和高程控制网", "放样定位", "竣工测量"], ans:1, exp:'教材原文：施工控制测量的目的是在施工场地上建立统一的平面和高程控制网，作为施工放样的依据。'},
+  {id:316, ch:10, type:'single', q:'施工测量中，直线定线的方法不包括？', opts:["目估定线", "经纬仪定线", "全站仪定线", "水准仪定线"], ans:3, exp:'教材原文：直线定线的方法有目估定线、经纬仪定线和全站仪定线等。水准仪主要用于测量高差，不用于直线定线。'},
+  {id:317, ch:10, type:'single', q:'导线测量中，导线布设的形式不包括？', opts:["闭合导线", "附合导线", "支导线", "方格网"], ans:3, exp:'教材原文：导线布设的形式有闭合导线、附合导线和支导线三种。方格网是另一种控制网形式。'},
+  {id:318, ch:10, type:'single', q:'水准仪圆水准器的功能是？', opts:["精确整平", "粗平", "对中", "瞄准"], ans:1, exp:'教材原文：圆水准器用于粗略整平仪器（粗平），管水准器用于精确整平仪器（精平）。'},
+  {id:319, ch:10, type:'single', q:'施工放样中，已知点和待放样点之间通视良好时，通常采用什么方法？', opts:["极坐标法", "直角坐标法", "距离交会法", "方向线法"], ans:0, exp:'教材原文：极坐标法是根据已知方向角和距离确定待放样点的位置，在已知点和待放样点通视良好时适用。'},
+  {id:320, ch:10, type:'single', q:'施工测量中，高程控制网一般采用什么方法建立？', opts:["三角高程测量", "水准测量", "GPS测量", "导线测量"], ans:1, exp:'教材原文：高程控制网一般采用水准测量的方法建立，通过水准路线连接各水准点形成高程控制网。'},
+  {id:321, ch:10, type:'single', q:'竣工测量的内容包括？', opts:["施工前的地形测量", "施工过程中各阶段的测量", "施工后验收前的各项测量", "施工控制测量"], ans:2, exp:'教材原文：竣工测量应在施工后、验收前进行，内容包括建（构）筑物的位置、尺寸、标高等竣工后的实际数据。'},
+  {id:322, ch:10, type:'single', q:'水准测量中，前后视距相等可以消除什么误差？', opts:["调焦误差", "视差", "i角误差", "读数误差"], ans:2, exp:'教材原文：水准测量中使前后视距相等可以消除或减弱由于水准管轴不平行于视准轴产生的i角误差。'},
+  {id:323, ch:11, type:'single', q:'施工监测中，必测项目是指？', opts:["根据工程需要选择", "设计图纸要求必须进行的监测项目", "所有工程都必须进行的监测项目", "建设方指定的监测项目"], ans:2, exp:'教材原文：必测项目是指所有工程都必须进行的监测项目，是保证施工安全的基本要求。'},
+  {id:324, ch:11, type:'single', q:'基坑工程支护结构深层水平位移监测应采用什么仪器？', opts:["水准仪", "测斜仪", "全站仪", "经纬仪"], ans:1, exp:'教材原文：深层水平位移监测应采用测斜仪，通过预埋测斜管测量不同深度处的水平位移。'},
+  {id:325, ch:11, type:'single', q:'监测频率应根据什么确定？', opts:["仅根据施工进度", "施工阶段、监测对象的变化速率和监测等级", "仅根据规范", "仅根据监理要求"], ans:1, exp:'教材原文：监测频率应根据施工阶段、监测对象的变化速率和监测等级等因素综合确定。'},
+  {id:326, ch:11, type:'single', q:'施工监测中，当监测数据达到预警值时，应做什么？', opts:["立即发出预警信号，启动应急预案", "继续观察", "降低监测频率", "停止施工等待设计变更"], ans:0, exp:'教材原文：当施工监测数据达到预警标准时，应立即向施工单位项目负责人报告，发出预警信号，启动应急预案。'},
+  {id:327, ch:11, type:'single', q:'基坑周边建筑竖向位移监测应采用什么方法？', opts:["水准测量", "测斜", "GPS", "激光扫描"], ans:0, exp:'教材原文：基坑周边建筑竖向位移监测一般采用水准测量的方法，通过监测点间的高差变化计算沉降量。'},
+  {id:328, ch:11, type:'single', q:'施工监测中，选测项目是指在什么情况下需要进行的项目？', opts:["规范强制要求", "根据工程特点和需要选择", "所有工程都需进行", "施工方自行决定"], ans:1, exp:'教材原文：选测项目是根据工程特点、地质条件和周边环境等需要选择进行监测的项目。'},
+  {id:329, ch:11, type:'single', q:'施工监测报告中不需要包含的内容是？', opts:["监测数据汇总", "施工预算", "变化趋势分析", "预警统计"], ans:1, exp:'教材原文：监测报告应包含工程概况、监测依据、监测数据汇总、变化趋势分析、预警统计等内容。施工预算不属于监测报告内容。'},
+  {id:330, ch:11, type:'single', q:'监测点的布设应能全面反映什么？', opts:["施工进度", "监测对象的变形状态", "工程质量", "建设成本"], ans:1, exp:'教材原文：监测点的布设应能全面反映监测对象的变形状态，关键部位应加密布设。'},
+  {id:331, ch:11, type:'single', q:'基坑工程监测中，支撑轴力监测的主要目的是？', opts:["控制支撑施工质量", "了解支撑受力状态", "控制支撑变形", "指导支撑拆除"], ans:1, exp:'教材原文：支撑轴力监测的主要目的是了解支撑结构在施工过程中的受力状态，判断支撑结构是否安全。'},
+  {id:332, ch:11, type:'single', q:'施工监测中，监测数据应及时整理分析，当超过预警值时，应同时提交什么？', opts:["竣工报告", "预警报告和处理措施建议", "监理报告", "设计变更"], ans:1, exp:'教材原文：监测数据应及时整理分析，当超过预警值时，应同时提交预警报告和处理措施建议。'},
+  {id:333, ch:12, type:'single', q:'根据《建筑法》，建筑工程开工前，建设单位应当按照国家有关规定向工程所在地什么部门申请领取施工许可证？', opts:["建设行政主管部门", "发展改革部门", "规划部门", "环保部门"], ans:0, exp:'教材原文：《建筑法》规定：建筑工程开工前，建设单位应当按照国家有关规定向工程所在地县级以上人民政府建设行政主管部门申请领取施工许可证。'},
+  {id:334, ch:12, type:'single', q:'根据《建筑法》，大型建筑工程或者结构复杂的建筑工程，可以由几个以上的承包单位联合共同承包？', opts:["1个", "2个", "3个", "4个"], ans:1, exp:'教材原文：《建筑法》规定：大型建筑工程或者结构复杂的建筑工程，可以由两个以上的承包单位联合共同承包。'},
+  {id:335, ch:12, type:'single', q:'《建筑法》规定，建筑工程主体结构施工必须由谁完成？', opts:["总承包单位自行完成", "分包单位完成", "建设单位完成", "专业分包完成"], ans:0, exp:'教材原文：《建筑法》规定：建筑工程主体结构的施工必须由总承包单位自行完成，不得分包。'},
+  {id:336, ch:12, type:'single', q:'根据《招标投标法》，招标人和中标人应自中标通知书发出之日起多少日内订立书面合同？', opts:["15日", "20日", "30日", "45日"], ans:2, exp:'教材原文：《招标投标法》规定：招标人和中标人应当自中标通知书发出之日起三十日内订立书面合同。'},
+  {id:337, ch:12, type:'single', q:'《建设工程质量管理条例》规定，在正常使用条件下，基础设施工程的保修期为？', opts:["2年", "5年", "合理使用年限", "10年"], ans:2, exp:'教材原文：《建设工程质量管理条例》规定，基础设施工程、房屋建筑的地基基础工程和主体结构工程的最低保修期限为设计文件规定的该工程的合理使用年限。'},
+  {id:338, ch:12, type:'single', q:'《建设工程安全生产管理条例》规定，施工单位应当自施工起重机械验收合格之日起多少日内向建设行政主管部门登记？', opts:["15日", "30日", "45日", "60日"], ans:1, exp:'教材原文：《建设工程安全生产管理条例》规定：施工单位应当自施工起重机械和整体提升脚手架、模板等自升式架设设施验收合格之日起30日内，向建设行政主管部门或者其他有关部门登记。'},
+  {id:339, ch:12, type:'single', q:'根据《安全生产法》，生产经营单位的主要负责人对本单位安全生产工作负有什么职责？', opts:["领导责任", "直接责任", "全面责任", "监督责任"], ans:2, exp:'教材原文：《安全生产法》规定：生产经营单位的主要负责人对本单位安全生产工作全面负责。'},
+  {id:340, ch:12, type:'single', q:'《建设工程质量管理条例》中，建设工程实行质量保修制度，供热与供冷系统的最低保修期为？', opts:["2个采暖期、供冷期", "2年", "5年", "合理使用年限"], ans:0, exp:'教材原文：《建设工程质量管理条例》规定：供热与供冷系统的最低保修期为2个采暖期、供冷期。'},
+  {id:341, ch:12, type:'single', q:'根据《大气污染防治法》，施工单位应当在施工工地设置什么设施？', opts:["硬质围挡", "临时厕所", "临时办公室", "休息室"], ans:0, exp:'教材原文：《大气污染防治法》规定：施工单位应当在施工工地设置硬质围挡，并采取覆盖、分段作业、择时施工、洒水抑尘、冲洗地面和车辆等有效防尘降尘措施。'},
+  {id:342, ch:12, type:'single', q:'《消防法》规定，需要进行消防设计的建筑工程，未经消防验收或者消防验收不合格的，什么？', opts:["可以先行使用", "禁止投入使用", "可以边使用边整改", "经主管部门同意后可投入使用"], ans:1, exp:'教材原文：《消防法》规定：依法应当进行消防验收的建设工程，未经消防验收或者消防验收不合格的，禁止投入使用。'},
+  {id:343, ch:13, type:'single', q:'超过一定规模的危大工程中，搭设高度多少及以上需专家论证？', opts:["8m", "10m", "12m", "15m"], ans:0, exp:'教材原文：超过一定规模的危大工程中，搭设高度8m及以上的混凝土模板支撑工程需专家论证。'},
+  {id:344, ch:13, type:'single', q:'超过一定规模的危大工程中，施工总荷载（设计值）多少及以上需专家论证？', opts:["10kN/m²", "12kN/m²", "15kN/m²", "20kN/m²"], ans:2, exp:'教材原文：超过一定规模的危大工程中，施工总荷载（设计值）15kN/m²及以上需专家论证。'},
+  {id:345, ch:13, type:'single', q:'危大工程专项施工方案实施前，编制人员或者项目技术负责人应当向施工现场管理人员进行什么？', opts:["技术交底", "方案评审", "设计交底", "图纸会审"], ans:0, exp:'教材原文：危大工程专项施工方案实施前，编制人员或者项目技术负责人应当向施工现场管理人员进行方案交底。'},
+  {id:346, ch:13, type:'single', q:'超过一定规模的危大工程，专项施工方案经施工单位审核后，还应由谁审核？', opts:["建设单位项目负责人", "总监理工程师", "设计单位负责人", "质量监督机构"], ans:1, exp:'教材原文：专项施工方案应当由施工单位技术负责人审核签字、加盖单位公章，并由总监理工程师审查签字、加盖执业印章后方可实施。'},
+  {id:347, ch:13, type:'single', q:'危大工程专项施工方案专家论证会后，论证结论为什么时方可实施？', opts:["通过", "修改后通过", "通过或修改后通过", "不通过"], ans:2, exp:'教材原文：专家论证会后，应当形成论证报告，对专项施工方案提出\'通过\'\'修改后通过\'或者\'不通过\'的结论。\'通过\'或\'修改后通过\'的方可实施。'},
+  {id:348, ch:13, type:'single', q:'超过一定规模的危大工程中，集中线荷载（设计值）多少及以上需专家论证？', opts:["15kN/m", "20kN/m", "25kN/m", "30kN/m"], ans:1, exp:'教材原文：超过一定规模的危大工程中，集中线荷载（设计值）20kN/m及以上需专家论证。'},
+  {id:349, ch:13, type:'single', q:'承重支撑体系承受单点集中荷载多少及以上需专家论证？', opts:["5kN", "7kN", "10kN", "12kN"], ans:1, exp:'教材原文：承重支撑体系承受单点集中荷载7kN及以上需专家论证。'},
+  {id:350, ch:13, type:'single', q:'脚手架工程中，落地式钢管脚手架搭设高度多少及以上需专家论证？', opts:["30m", "40m", "50m", "60m"], ans:2, exp:'教材原文：落地式钢管脚手架搭设高度50m及以上需专家论证。'},
+  {id:351, ch:13, type:'single', q:'危大工程专项施工方案的主要内容不包括？', opts:["工程概况", "编制依据", "施工预算", "施工工艺技术"], ans:2, exp:'教材原文：危大工程专项施工方案主要内容包括工程概况、编制依据、施工计划、施工工艺技术、施工安全保证措施、施工管理人员和作业人员配备、验收要求、应急处置措施、计算书及相关图纸。施工预算不属于方案内容。'},
+  {id:352, ch:13, type:'single', q:'超过一定规模的危大工程中，开挖深度超过多少的基坑需组织专家论证？', opts:["3m（含3m）", "4m（含4m）", "5m（含5m）", "6m（含6m）"], ans:2, exp:'教材原文：超过一定规模的危大工程中，开挖深度超过5m（含5m）的基坑需组织专家论证。'},
+  {id:353, ch:14, type:'single', q:'工程总承包单位对承包范围内工程的什么负总责？', opts:["工程质量", "工程进度", "安全生产", "工程投资"], ans:2, exp:'教材原文：工程总承包单位对承包范围内工程的安全生产负总责。'},
+  {id:354, ch:14, type:'single', q:'政府投资项目的工程总承包宜采用什么合同形式？', opts:["总价合同", "单价合同", "成本加酬金合同", "可调价合同"], ans:0, exp:'教材原文：政府投资项目的工程总承包宜采用总价合同形式。企业投资项目的工程总承包也宜采用总价合同。'},
+  {id:355, ch:14, type:'single', q:'工程总承包项目应设置项目管理机构，项目经理应具备什么条件？', opts:["相应注册执业资格", "中级以上职称", "五年以上工作经验", "大专以上学历"], ans:0, exp:'教材原文：工程总承包项目经理应当取得工程建设类注册执业资格，包括注册建筑师、勘察设计注册工程师、注册建造师或者注册监理工程师等。'},
+  {id:356, ch:14, type:'single', q:'施工项目经理部应建立什么制度？', opts:["质量管理制度", "技术管理制度", "安全生产责任制度", "进度管理制度"], ans:2, exp:'教材原文：施工项目经理部应建立安全生产责任制度，明确各岗位人员的安全生产职责。'},
+  {id:357, ch:14, type:'single', q:'危险性较大的分部分项工程施工前应编制什么文件？', opts:["施工组织设计", "专项施工方案", "安全技术措施", "应急预案"], ans:1, exp:'教材原文：危险性较大分部分项工程施工前应单独编制专项施工方案。'},
+  {id:358, ch:14, type:'multi', q:'超过一定规模的危大工程专家论证会参加人员包括？（多选）', opts:["专家", "建设单位项目负责人", "监理单位项目总监理工程师", "施工单位分管安全的负责人", "设计单位项目负责人"], ans:[0, 1, 2, 3, 4], exp:'教材原文：专家论证会参加人员包括：专家、建设单位项目负责人、监理单位项目总监理工程师及相关人员、施工单位分管安全的负责人、技术负责人、项目负责人、项目技术负责人、专项方案编制人员、勘察、设计单位项目技术负责人及相关人员。'},
+  {id:359, ch:14, type:'multi', q:'施工组织设计主要内容包括？（多选）', opts:["工程概况", "施工部署", "施工方案", "施工进度计划", "施工预算"], ans:[0, 1, 2, 3], exp:'教材原文：施工组织设计中主要内容包括：工程概况、施工部署、施工方案、施工进度计划、资源配置计划、施工平面布置等。施工预算属于成本管理范畴，不属于施工组织设计主体内容。'},
+  {id:360, ch:14, type:'multi', q:'工程总承包单位的管理要求包括？（多选）', opts:["设立项目管理机构", "设置项目经理", "配备相应管理人员", "加强设计采购与施工协调", "所有施工都由总承包自行完成"], ans:[0, 1, 2, 3], exp:'教材原文：工程总承包单位的管理要求包括：设立项目管理机构、设置项目经理、配备相应管理人员、加强设计采购与施工协调。总承包可将部分专业工程依法分包。'},
+  {id:361, ch:1, type:'multi', q:'沥青路面面层的性能要求包括？（多选）', opts:["足够的结构强度", "高温稳定性", "低温抗裂性", "抗滑能力", "良好的水稳定性"], ans:[0, 1, 2, 3, 4], exp:'教材原文：面层应具有足够的结构强度、高温稳定性、低温抗裂性以及抗疲劳、抗水损害能力；还应有足够的抗滑能力及良好的平整度。'},
+  {id:362, ch:1, type:'multi', q:'按路面材料分类，城镇道路路面包括哪些类型？（多选）', opts:["沥青路面", "水泥混凝土路面", "砌块路面", "砂石路面", "土路面"], ans:[0, 1, 2], exp:'教材原文：根据路面材料可分为沥青路面、水泥混凝土路面和砌块路面。沥青路面又分为沥青混凝土、沥青贯入式和沥青表面处治路面。'},
+  {id:363, ch:1, type:'multi', q:'下列哪些属于路基处理方法中置换及拌入的方法？（多选）', opts:["振冲置换", "深层搅拌", "高压喷射注浆", "石灰桩", "CFG桩"], ans:[0, 1, 2, 3, 4], exp:'教材原文：置换及拌入的方法包括振冲置换、深层搅拌、高压喷射注浆、石灰桩、CFG桩等。'},
+  {id:364, ch:1, type:'multi', q:'路基施工应遵循的原则包括？（多选）', opts:["先地下后地上", "先深后浅", "先道路后管线", "先填后挖", "分层填筑"], ans:[0, 1, 4], exp:'教材原文：路基施工应遵循\'先地下后地上\'的原则，先完成路基范围内的地下管线再填筑路基；挖土时应自上向下分层开挖；填土应分层填筑。'},
+  {id:365, ch:2, type:'multi', q:'按受力特点，桥梁的基本体系包括？（多选）', opts:["梁式", "拱式", "悬吊式", "刚架式", "组合体系"], ans:[0, 1, 2], exp:'教材原文：由基本件组成的各种结构物，在力学上也可归结为梁式、拱式、悬吊式三种基本体系以及它们之间的各种组合。'},
+  {id:366, ch:2, type:'multi', q:'沉入桩的沉桩方式按施工方法可分为？（多选）', opts:["锤击沉桩", "振动沉桩", "射水沉桩", "静力压桩", "钻孔沉桩"], ans:[0, 1, 2, 3], exp:'教材原文：教材指出沉入桩的方式包括锤击沉桩、振动沉桩、射水沉桩和静力压桩等。钻孔沉桩不属于沉入桩方式。'},
+  {id:367, ch:3, type:'multi', q:'明挖法按基坑围护不同可分为哪些类型？（多选）', opts:["敞口放坡明挖法", "有围护结构明挖法", "盖挖顺作法", "盖挖逆作法", "暗挖法"], ans:[0, 1], exp:'教材原文：明挖法按基坑围护不同可分为敞口放坡明挖法和有围护结构明挖法两大类。盖挖法属于明挖的变体。'},
+  {id:368, ch:3, type:'multi', q:'地下工程主体结构防水包括哪些内容？（多选）', opts:["结构自防水", "防水层", "施工缝处理", "变形缝处理", "排水沟"], ans:[0, 1, 2, 3], exp:'教材原文：地下工程主体结构防水工程的内容包括结构自防水、防水层、施工缝处理、变形缝处理等。排水沟属于辅助排水措施，不属于主体结构防水工程内容。'},
+  {id:369, ch:5, type:'multi', q:'给水排水管道功能性试验包括哪些？（多选）', opts:["压力管道水压试验", "无压管道严密性试验", "管道冲洗消毒", "管道吹扫", "管道保温试验"], ans:[0, 1, 2, 3], exp:'教材原文：给水排水管道功能性试验包括：压力管道水压试验、无压管道严密性试验、管道冲洗消毒以及管道吹扫等。管道保温属于供热管道的要求。'},
+  {id:370, ch:14, type:'single', q:'工程总承包单位应当设立什么机构？', opts:["技术研发中心", "项目管理机构", "安全生产委员会", "质量管理部"], ans:1, exp:'教材原文：工程总承包单位应当设立项目管理机构，设置项目经理，配备相应管理人员。'},
+  {id:371, ch:1, type:'single', q:'路基施工中，地下水位接近或高于路床标高时，应设置什么设施？', opts:["暗沟或渗沟", "排水沟", "盲沟", "截水沟"], ans:0, exp:'教材原文：地下水位接近或高于路床标高时，应设置暗沟、渗沟或其他设施，以排除或截断地下水流，降低地下水位。'},
+  {id:372, ch:1, type:'single', q:'沥青路面结构层的性能要求中，基层应具有什么特性？', opts:["足够的强度和扩散荷载的能力以及水稳定性", "抗滑能力", "平整度", "抗冻能力"], ans:0, exp:'教材原文：基层主要起承重作用，应具有足够的强度和扩散荷载的能力并具有足够的水稳定性。'},
+  {id:373, ch:2, type:'single', q:'桥梁支座系统的功能不包括下列哪项？', opts:["传递荷载", "保证桥跨结构产生一定变位", "承受行车荷载", "连接上部结构与下部结构"], ans:2, exp:'教材原文：支座系统是在桥跨结构与桥墩或桥台的支承处设置的传力装置，不仅要传递很大的荷载，而且要保证桥跨结构能产生一定的变位。承受行车荷载是桥面铺装的功能。'},
+  {id:374, ch:2, type:'single', q:'预应力混凝土连续梁悬臂浇筑施工时，合龙前应按设计要求将两悬臂端进行什么处理？', opts:["临时连接", "永久连接", "拆除连接", "加固处理"], ans:0, exp:'教材原文：合龙前应按设计要求将两悬臂端临时连接，以保证合龙段施工期间的稳定和受力安全。'},
+  {id:375, ch:3, type:'single', q:'盾构法隧道衬砌管片的类型有三种，不包括以下哪种？', opts:["标准环+左右转弯环", "通用型管片（楔形管片）", "楔形管片", "现浇混凝土管片"], ans:3, exp:'教材原文：目前通常采用的管片类型有三种：标准环+左右转弯环组合、通用型管片（楔形管片）、楔形管片。现浇混凝土管片不属于预制装配式管片类型。'},
+  {id:376, ch:3, type:'single', q:'城市隧道工程中，超前小导管注浆的主要作用是？', opts:["加固掌子面前方围岩", "润滑管片", "固定钢筋网", "增加隧道净空"], ans:0, exp:'教材原文：超前小导管注浆宜选用水泥浆或水泥水玻璃浆，在隧道开挖前对前方围岩进行预支护和止水，加固掌子面前方围岩。'},
+  {id:377, ch:4, type:'single', q:'AAO工艺中，污水进入厌氧反应器的主要作用是？', opts:["硝化反应", "反硝化反应", "聚磷菌释放磷", "有机物降解"], ans:2, exp:'教材原文：污水首先进入厌氧反应器，对污水中部分含氮有机物进行氧化，同时聚磷菌释放与污水同步进入厌氧反应器的含磷回流污泥中的磷。'},
+  {id:378, ch:4, type:'single', q:'污水处理活性污泥法中，污泥回流系统的作用是？', opts:["排放剩余污泥", "将二沉池的活性污泥回流到曝气池", "输送原污水", "排出处理水"], ans:1, exp:'教材原文：传统活性污泥处理系统主要包括曝气池、二次沉淀池、污泥回流系统及曝气和空气扩散装置等。污泥回流系统将二沉池沉淀的活性污泥回流到曝气池，维持曝气池中的微生物浓度。'},
+  {id:379, ch:5, type:'single', q:'燃气管道安装完成后，应按顺序进行哪三项工作？', opts:["强度试验→严密性试验→吹扫", "吹扫→强度试验→严密性试验", "严密性试验→强度试验→吹扫", "吹扫→严密性试验→强度试验"], ans:1, exp:'教材原文：燃气管道安装完成后，应依次进行吹扫→强度试验→严密性试验。'},
+  {id:380, ch:5, type:'single', q:'闭气试验中，当实测气体压力P≥多少时判定合格？', opts:["≥1000Pa", "≥1500Pa", "≥2000Pa", "≥2500Pa"], ans:1, exp:'教材原文：闭气试验中实测气体压力P≥1500Pa可判定合格。'},
+  {id:381, ch:6, type:'single', q:'综合管廊的两种主要施工方法中，明挖法适用于什么条件？', opts:["仅适用于新建道路", "适用于新建道路和已建成道路", "仅适用于已建成道路", "仅适用于郊区"], ans:0, exp:'教材原文：明挖法适用于新建道路（施工对交通和环境影响较小的情况下），暗挖法则适用于已建成道路和交通繁忙路段。'},
+  {id:382, ch:6, type:'multi', q:'城市综合管廊按功能可分为哪些类型？（多选）', opts:["干线综合管廊", "支线综合管廊", "缆线管廊", "给水管廊", "电力管廊"], ans:[0, 1, 2], exp:'教材原文：城市综合管廊按功能可分为干线综合管廊、支线综合管廊和缆线管廊三大类。'},
+  {id:383, ch:7, type:'single', q:'垃圾填埋场HDPE膜焊接前，对焊接部位的温湿度要求是？', opts:["保持潮湿", "保持清洁干燥", "任意温湿度", "高温高湿"], ans:1, exp:'教材原文：焊接前应去除灰尘、污物，使搭接部分保持清洁、干燥。'},
+  {id:384, ch:7, type:'multi', q:'生活垃圾填埋场泥质防水层施工质量检验项目包括？（多选）', opts:["压实度试验", "渗水试验", "抗拉强度试验", "膨胀度试验", "渗透系数试验"], ans:[0, 1], exp:'教材原文：泥质防水层质量检验项目包括压实度试验和渗水试验两项。'},
+  {id:385, ch:8, type:'single', q:'海绵城市建设中，绿色屋顶的主要功能是？', opts:["增加城市绿化", "削减径流量和净化雨水", "增加建筑高度", "降低建筑成本"], ans:1, exp:'教材原文：绿色屋顶是海绵城市源头减排设施之一，通过植被和基质层蓄水和蒸发作用削减径流量，同时净化雨水。'},
+  {id:386, ch:8, type:'multi', q:'海绵城市建设的灰色设施包括？（多选）', opts:["调蓄池", "雨水泵站", "雨水花园", "排水管网", "下沉式绿地"], ans:[0, 1, 3], exp:'教材原文：海绵城市灰色设施包括调蓄池、雨水泵站、排水管网等传统工程设施。雨水花园和下沉式绿地属于绿色设施。'},
+  {id:387, ch:9, type:'multi', q:'城市基础设施更新工程中，旧路改造的常用技术措施包括？（多选）', opts:["加铺沥青面层", "旧板破碎利用", "铺设土工合成材料", "重新压实路基", "拆除重建"], ans:[0, 1, 2, 3], exp:'教材原文：旧路改造常用技术措施包括加铺沥青面层、旧板破碎利用、铺设土工合成材料防止反射裂缝、重新压实路基等。拆除重建是彻底改造方案。'},
+  {id:388, ch:9, type:'single', q:'桥梁加固中，粘贴钢板加固法对梁体的主要作用是什么？', opts:["提高抗弯和抗剪能力", "提高抗震能力", "减轻自重", "增加跨度"], ans:0, exp:'教材原文：桥梁粘贴钢板加固法主要提高的是抗弯和抗剪能力。通过环氧树脂将钢板粘贴在梁体受拉区或剪力区，增加截面刚度和承载力。'},
+  {id:389, ch:10, type:'single', q:'施工测量中，控制点布设的原则是？', opts:["从整体到局部，由高级到低级", "从点到面", "从局部到整体", "均匀布设"], ans:0, exp:'教材原文：施工测量的基本原则是从整体到局部，先控制后碎部。控制点布设也应遵循从整体到局部、由高级到低级的原则。'},
+  {id:390, ch:10, type:'multi', q:'施工测量常用的仪器包括？（多选）', opts:["全站仪", "水准仪", "GPS接收机", "测斜仪", "回弹仪"], ans:[0, 1, 2, 3], exp:'教材原文：施工测量常用仪器包括全站仪、水准仪、GPS接收机、测斜仪等。回弹仪是检测混凝土强度的仪器，不属于测量仪器。'},
+  {id:391, ch:11, type:'multi', q:'基坑工程必测项目包括？（多选）', opts:["基坑周边地表沉降", "围护结构顶部水平位移", "地下水位", "支撑轴力", "土压力"], ans:[0, 1, 2, 3], exp:'教材原文：基坑工程必测项目包括基坑周边地表沉降、围护结构顶部水平位移、围护结构深层水平位移、支撑轴力、地下水位等。土压力属于选测项目。'},
+  {id:392, ch:11, type:'multi', q:'施工监测数据预警等级通常分为？（多选）', opts:["预警值", "报警值", "极限值", "破坏值", "临界值"], ans:[0, 1, 2], exp:'教材原文：施工监测预警等级通常分为预警值（黄色）、报警值（橙色）和极限值（红色）三级，对应的处置措施逐级加强。'},
+  {id:393, ch:12, type:'single', q:'根据《建设工程安全生产管理条例》，国家对严重危及施工安全的工艺、设备实行什么制度？', opts:["淘汰制度", "审批制度", "备案制度", "登记制度"], ans:0, exp:'教材原文：《建设工程安全生产管理条例》规定：国家对严重危及施工安全的工艺、设备、材料实行淘汰制度。'},
+  {id:394, ch:12, type:'multi', q:'《建设工程质量管理条例》规定，施工单位必须按照什么施工，不得擅自修改设计？', opts:["工程设计图纸", "施工技术标准", "投标文件", "施工合同", "监理规划"], ans:[0, 1], exp:'教材原文：《建设工程质量管理条例》规定：施工单位必须按照工程设计图纸和施工技术标准施工，不得擅自修改工程设计，不得偷工减料。'},
+  {id:395, ch:13, type:'multi', q:'超过一定规模的危大工程中，需专家论证的深基坑工程条件包括？（多选）', opts:["开挖深度超过5m（含5m）", "地下室三层以上", "深度虽未超过5m但地质条件和周边环境复杂", "开挖深度3m", "开挖深度4m"], ans:[0, 1, 2], exp:'教材原文：超过一定规模的危大工程中，开挖深度超过5m（含5m）的基坑（槽）的土方开挖、支护、降水工程，或开挖深度虽未超过5m但地质条件和周边环境复杂的基坑工程，均需专家论证。地下室三层以上（或开挖深度超12m）也需论证。'},
+  {id:396, ch:13, type:'single', q:'危大工程专项施工方案实施前，应向什么人员进行方案交底？', opts:["施工现场管理人员", "建设单位人员", "设计单位人员", "监理单位人员"], ans:0, exp:'教材原文：危大工程专项施工方案实施前，编制人员或者项目技术负责人应当向施工现场管理人员进行方案交底。'},
+  {id:397, ch:14, type:'single', q:'施工项目经理部的安全生产第一责任人是？', opts:["项目经理", "项目技术负责人", "安全总监", "施工员"], ans:0, exp:'教材原文：项目经理是施工项目安全生产的第一责任人，对项目安全生产全面负责。'},
+  {id:398, ch:14, type:'single', q:'工程总承包项目管理的核心内容不包括？', opts:["设计管理", "采购管理", "施工管理", "资产运营管理"], ans:3, exp:'教材原文：工程总承包项目管理主要包括设计管理、采购管理、施工管理和试运行管理。资产运营管理不属于工程总承包阶段的项目管理内容。'},
+  {id:399, ch:14, type:'single', q:'专项施工方案经施工单位技术负责人审核后，还须经谁审查签字方可实施？', opts:["建设单位项目负责人", "总监理工程师", "质量监督站站长", "设计单位负责人"], ans:1, exp:'教材原文：专项施工方案应当由施工单位技术负责人审核签字、加盖单位公章，并由总监理工程师审查签字、加盖执业印章后方可实施。'},
+  {id:400, ch:14, type:'single', q:'施工安全技术交底应分级进行，其中施工项目的安全技术交底应由谁进行？', opts:["项目经理向项目管理人员", "项目技术负责人向施工班组", "安全员向作业人员", "施工员向作业人员"], ans:1, exp:'教材原文：安全技术交底应分级进行，项目技术负责人向施工班组（或施工作业人员）进行安全技术交底，交底应书面进行并签字确认。'}
+];
+
+const CHAPTERS = [
+  {id:1,name:'城镇道路工程'},
+  {id:2,name:'城市桥梁工程'},
+  {id:3,name:'城市隧道工程与轨道交通'},
+  {id:4,name:'给水排水处理厂站'},
+  {id:5,name:'城市管道工程'},
+  {id:6,name:'城市综合管廊工程'},
+  {id:7,name:'垃圾处理工程'},
+  {id:8,name:'海绵城市建设'},
+  {id:9,name:'城市基础设施更新工程'},
+  {id:10,name:'施工测量'},
+  {id:11,name:'施工监测'},
+  {id:12,name:'相关法规'},
+  {id:13,name:'相关标准'},
+  {id:14,name:'项目管理实务'}
+];
+
+let state = {
+  APP_VERSION: 'v1.1.0',
+  settings: {showAnswer: true, shuffleOpts: false, examTime: 30, practiceCount: 25},
+  progress: {},
+  wrongIds: []
+};
+
+function loadState(){
+  try{
+    const s = localStorage.getItem('yjsz_state');
+    if(s) Object.assign(state, JSON.parse(s));
+  }catch(e){}
+}
+function saveState(){
+  try{localStorage.setItem('yjsz_state', JSON.stringify(state));}catch(e){}
+}
+
+function checkUpdate(){
+  const status = document.getElementById('updateStatus');
+  status.innerHTML = '📲 请对我说 <strong>"小艺，更新题库"</strong><br><span style="font-size:12px;color:var(--text2)">我会把最新版本发到你的手机上</span>';
+  status.style.color = 'var(--text2)';
+}
+
+function shuffleArray(a){
+  for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
+  return a;
+}
+
+function getQuestionsByChapter(chId, count){
+  let pool = QUESTIONS.filter(q => q.ch === chId);
+  shuffleArray(pool);
+  return pool.slice(0, Math.min(count||50, pool.length));
+}
+
+function getRandomQuestions(count){
+  let pool = [...QUESTIONS];
+  shuffleArray(pool);
+  return pool.slice(0, Math.min(count||25, pool.length));
+}
+
+function getWrongQuestions(){
+  let pool = QUESTIONS.filter(q => state.wrongIds.includes(q.id));
+  shuffleArray(pool);
+  return pool;
+}
+
+let quiz = {questions:[], current:0, answers:[], mode:'practice', timer:null, timeLeft:0};
+
+function startRandom(){
+  const pc = state.settings.practiceCount || 25;
+  const qs = getRandomQuestions(pc);
+  if(!qs.length) return showToast('题库为空');
+  startQuiz(qs, 'practice', '🎲 随机练习（'+pc+'题）');
+}
+
+function startWrongOnly(){
+  const qs = getWrongQuestions();
+  if(!qs.length) return showToast('暂无错题');
+  startQuiz(qs, 'wrong', '📕 错题重练（'+qs.length+'题）');
+}
+
+function startByChapter(chId){
+  if(chId === -1){document.getElementById('chapterGrid').scrollIntoView({behavior:'smooth'});return;}
+  const qs = getQuestionsByChapter(chId, 50);
+  if(!qs.length) return showToast('该章节暂无题目');
+  const chName = CHAPTERS.find(c=>c.id===chId)?.name||'';
+  startQuiz(qs, 'practice', '📚 '+chName+'（'+qs.length+'题）');
+}
+
+function startExam(){
+  const qs = getRandomQuestions(30);
+  if(!qs.length) return showToast('题库为空');
+  startQuiz(qs, 'exam', '⏱️ 模拟考试（30题）');
+  quiz.timeLeft = state.settings.examTime * 60;
+  startTimer();
+}
+
+function startQuiz(qs, mode, title){
+  quiz.questions = qs;
+  quiz.current = 0;
+  quiz.mode = mode;
+  quiz.answers = qs.map(() => -1);
+  document.getElementById('practiceTitle').textContent = title;
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-practice').classList.add('active');
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  renderQuestion();
+}
+
+function renderQuestion(){
+  const qs = quiz.questions;
+  const idx = quiz.current;
+  if(idx >= qs.length){finishQuiz();return;}
+  const q = qs[idx];
+  const total = qs.length;
+  document.getElementById('progressInfo').textContent = (idx+1)+'/'+total + (quiz.mode==='exam'&&quiz.timer?' | '+Math.floor(quiz.timeLeft/60)+':'+(quiz.timeLeft%60<10?'0':'')+quiz.timeLeft%60:'');
+  document.getElementById('progressFill').style.width = ((idx+1)/total*100)+'%';
+  const area = document.getElementById('questionArea');
+  const typeLabel = q.type==='single'?'单选题':'多选题';
+  const chName = CHAPTERS.find(c=>c.id===q.ch)?.name||'';
+  const tags = ['A','B','C','D','E','F'];
+  let ans = quiz.answers[idx];
+  const isSingle = q.type === 'single';
+  let selected = isSingle ? (ans===-1?[]:[ans]) : (Array.isArray(ans)?ans:[]);
+  let html = '<div class="q-card"><div class="q-meta"><span class="q-num">第'+(idx+1)+'题</span><span class="q-type">'+typeLabel+' · '+chName+'</span></div><div class="q-text">'+q.q+'</div><div class="options">';
+  q.opts.forEach((opt,i)=>{
+    const sel = selected.includes(i)?' selected':'';
+    html += '<div class="option'+sel+'" data-idx="'+i+'" onclick="selectOpt('+i+')"><div class="tag">'+tags[i]+'</div><div class="text">'+opt+'</div></div>';
+  });
+  html += '</div>';
+  html += '<div class="q-actions"><button class="btn-primary" onclick="confirmAnswer()">'+((quiz.mode==='exam')?'确认答案':'提交')+'</button><button class="btn-outline" onclick="skipQuestion()">跳过</button></div>';
+  if(idx>0) html += '<div style="text-align:center;margin-top:10px"><button class="btn-outline" onclick="prevQuestion()" style="flex:none;padding:8px 20px;font-size:13px">← 上一题</button></div>';
+  area.innerHTML = html;
+}
+
+function selectOpt(i){
+  const q = quiz.questions[quiz.current];
+  const idx = quiz.current;
+  if(q.type==='single'){
+    quiz.answers[idx] = i;
+  } else {
+    let cur = Array.isArray(quiz.answers[idx])?[...quiz.answers[idx]]:[];
+    if(cur.includes(i)) cur = cur.filter(x=>x!==i);
+    else cur.push(i);
+    quiz.answers[idx] = cur;
+  }
+  renderQuestion();
+}
+
+function getCorrectAnswer(q){return q.ans;}
+
+function formatAnswer(q){
+  if(q.type==='single') return 'ABCDEF'[q.ans];
+  if(Array.isArray(q.ans)) return q.ans.map(a=>'ABCDEF'[a]).join('');
+  return '';
+}
+
+function arraysEqual(a,b){
+  if(!a||!b||a.length!==b.length) return false;
+  return [...a].sort().join()===[...b].sort().join();
+}
+
+function confirmAnswer(){
+  const q = quiz.questions[quiz.current];
+  const idx = quiz.current;
+  const ans = quiz.answers[idx];
+  const correct = getCorrectAnswer(q);
+  const isSingle = q.type==='single';
+  let isCorrect;
+  if(isSingle){
+    if(ans===-1) return showToast('请先选择一个选项');
+    isCorrect = ans===correct;
+  } else {
+    if(!Array.isArray(ans)||!ans.length) return showToast('请选择至少一个选项');
+    isCorrect = arraysEqual(ans,correct);
+  }
+  if(!state.progress[q.id]) state.progress[q.id]={correct:0,wrongCount:0,answered:0};
+  state.progress[q.id].answered++;
+  if(isCorrect) state.progress[q.id].correct++;
+  else {
+    state.progress[q.id].wrongCount++;
+    if(!state.wrongIds.includes(q.id)) state.wrongIds.unshift(q.id);
+    else {state.wrongIds=state.wrongIds.filter(x=>x!==q.id);state.wrongIds.unshift(q.id);}
+  }
+  saveState();
+  
+  const area = document.querySelector('#questionArea .options');
+  if(area){
+    area.querySelectorAll('.option').forEach(el=>{
+      el.classList.add('disabled');
+      const oi=parseInt(el.dataset.idx);
+      if(isSingle){if(oi===correct)el.classList.add('correct');else if(oi===ans&&ans!==correct)el.classList.add('wrong');}
+      else{if(correct.includes(oi))el.classList.add('correct');else if(Array.isArray(ans)&&ans.includes(oi))el.classList.add('wrong');}
+    });
+  }
+  
+  const fb = document.createElement('div');
+  fb.className='feedback show '+(isCorrect?'correct':'wrong');
+  const expText = q.exp ? '<div style="margin-top:8px;padding:10px 12px;background:#fff3e0;border-radius:8px;font-size:13px;line-height:1.7;border-left:3px solid #ff9800"><div style="font-weight:600;color:#e65100;margin-bottom:4px">📖 解析</div>'+q.exp+'</div>' : '';
+  fb.innerHTML='<div class="fb-title">'+(isCorrect?'✅ 回答正确':'❌ 回答错误')+'</div><div style="margin-bottom:6px">正确答案：'+formatAnswer(q)+'</div>'+expText;
+  document.querySelector('.q-card .q-actions').before(fb);
+  document.querySelector('.q-actions').innerHTML='<button class="btn-primary" onclick="nextQuestion()" style="flex:1">下一题 →</button>';
+}
+
+function nextQuestion(){quiz.current++;renderQuestion();}
+function prevQuestion(){if(quiz.current>0)quiz.current--;renderQuestion();}
+function skipQuestion(){quiz.current++;renderQuestion();}
+
+function finishQuiz(){
+  const total=quiz.questions.length;
+  let correct=0;
+  quiz.questions.forEach((q,i)=>{const a=quiz.answers[i];if(a===-1)return;if(q.type==='single'?a===getCorrectAnswer(q):arraysEqual(a,getCorrectAnswer(q)))correct++;});
+  const pct=total>0?Math.round(correct/total*100):0;
+  document.getElementById('questionArea').innerHTML='<div class="q-card" style="text-align:center;padding:30px"><div style="font-size:36px;margin-bottom:12px">'+(pct>=80?'🎉':pct>=60?'💪':'📚')+'</div><div style="font-size:20px;font-weight:700;margin-bottom:8px">练习完成！</div><div style="font-size:14px;color:var(--text2);margin-bottom:4px">共 '+total+' 题</div><div style="font-size:14px;color:var(--text2);margin-bottom:4px">答对 '+correct+' 题</div><div style="font-size:28px;font-weight:800;color:'+(pct>=80?'var(--success)':pct>=60?'#e37400':'var(--danger)')+'">'+pct+'%</div><div style="margin-top:20px;display:flex;gap:10px;justify-content:center"><button class="btn-primary" onclick="backToHome()" style="padding:12px 24px">返回首页</button><button class="btn-outline" onclick="startWrongOnly()" style="padding:12px 24px">错题重练</button></div></div>';
+  stopTimer();
+}
+
+function backToHome(){
+  stopTimer();
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-home').classList.add('active');
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelector('.tab[data-tab="home"]').classList.add('active');
+  updateStats();
+}
+
+document.querySelectorAll('.tab').forEach(tab=>{
+  tab.addEventListener('click',function(){
+    const name=this.dataset.tab;
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    document.getElementById('panel-'+name).classList.add('active');
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    this.classList.add('active');
+    if(name==='home')updateStats();
+    if(name==='wrong')renderWrongList();
+  });
+});
+
+function startTimer(){
+  stopTimer();
+  quiz.timer=setInterval(()=>{
+    quiz.timeLeft--;
+    if(quiz.timeLeft<=0){stopTimer();showToast('⏰ 时间到！');finishQuiz();return;}
+    renderQuestion();
+  },1000);
+}
+function stopTimer(){if(quiz.timer){clearInterval(quiz.timer);quiz.timer=null;}}
+
+function renderWrongList(){
+  const list=document.getElementById('wrongList');
+  const empty=document.getElementById('wrongEmpty');
+  if(!state.wrongIds.length){list.innerHTML='';empty.style.display='block';return;}
+  empty.style.display='none';
+  let html='<div style="margin-bottom:12px;display:flex;justify-content:space-between;align-items:center"><span style="font-size:13px;color:var(--text2)">共 '+state.wrongIds.length+' 道错题</span><button onclick="startWrongOnly()" style="padding:8px 16px;font-size:13px;border-radius:8px;border:none;color:#fff;background:var(--primary);cursor:pointer">开始重练</button></div>';
+  state.wrongIds.forEach(id=>{
+    const q=QUESTIONS.find(x=>x.id===id);
+    if(!q)return;
+    const ch=CHAPTERS.find(c=>c.id===q.ch);
+    html+='<div class="wrong-item" onclick="startQuiz([QUESTIONS.find(x=>x.id==='+id+')],\'wrong\',\'📕 错题回顾\')"><div class="ch">📖 '+(ch?ch.name:'')+' · '+(q.type==='single'?'单选':'多选')+'</div><div class="q">'+q.q+'</div><span class="tag-w">❌ 答错'+(state.progress[q.id]?.wrongCount||1)+'次</span></div>';
+  });
+  list.innerHTML=html;
+}
+
+function updateStats(){
+  const total=QUESTIONS.length;
+  const done=Object.keys(state.progress).length;
+  let correctCount=0,totalAttempts=0;
+  Object.values(state.progress).forEach(p=>{correctCount+=p.correct;totalAttempts+=p.answered;});
+  const rate=totalAttempts>0?Math.round(correctCount/totalAttempts*100):0;
+  document.getElementById('statTotal').textContent=total;
+  document.getElementById('statDone').textContent=done;
+  document.getElementById('statRate').textContent=rate+'%';
+  document.getElementById('statWrong').textContent=state.wrongIds.length;
+}
+
+function renderChapterGrid(){
+  const grid=document.getElementById('chapterGrid');
+  let html='';
+  CHAPTERS.forEach(ch=>{
+    const cnt=QUESTIONS.filter(q=>q.ch===ch.id).length;
+    html+='<div class="chapter-btn" onclick="startByChapter('+ch.id+')"><div><div class="name">第'+ch.id+'章 '+ch.name+'</div><div class="count">'+cnt+'题</div></div><span class="arrow">→</span></div>';
+  });
+  grid.innerHTML=html;
+}
+
+function toggleSetting(key){
+  state.settings[key]=!state.settings[key];
+  document.getElementById('toggle'+key.charAt(0).toUpperCase()+key.slice(1)).classList.toggle('on',state.settings[key]);
+  saveState();
+}
+
+function adjExamTime(delta){
+  let t=state.settings.examTime+delta;
+  if(t<10)t=10;if(t>120)t=120;
+  state.settings.examTime=t;
+  document.getElementById('examTimeDisplay').textContent=t;
+  saveState();
+}
+
+function adjPracticeCount(delta){
+  let t=(state.settings.practiceCount||25)+delta;
+  if(t<5)t=5;if(t>90)t=90;
+  state.settings.practiceCount=t;
+  document.getElementById('practiceCountSetting').textContent=t;
+  document.getElementById('practiceCountDisplay').textContent=t;
+  saveState();
+}
+
+function clearAllProgress(){
+  if(!confirm('确定清除所有练习进度和错题记录吗？'))return;
+  state.progress={};state.wrongIds=[];
+  saveState();updateStats();renderWrongList();showToast('已清除所有进度');
+}
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2000);
+}
+
+loadState();
+document.getElementById('toggleShowAnswer').classList.toggle('on', state.settings.showAnswer);
+document.getElementById('toggleShuffleOpts').classList.toggle('on', state.settings.shuffleOpts);
+document.getElementById('examTimeDisplay').textContent = state.settings.examTime;
+document.getElementById('practiceCountSetting').textContent = state.settings.practiceCount || 25;
+document.getElementById('practiceCountDisplay').textContent = state.settings.practiceCount || 25;
+document.getElementById('versionDisplay').textContent = state.APP_VERSION;
+updateStats();
+renderChapterGrid();
+</script>
+</body>
+</html>
