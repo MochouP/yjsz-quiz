@@ -107,6 +107,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica N
     <div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:8px">快速开始</div>
     <div class="quick-actions">
       <button class="qa-btn" onclick="startRandom()"><span class="icon">🎲</span>随机 <span id="practiceCountDisplay">25</span> 题</button>
+      <button class="qa-btn" onclick="startUnattempted()"><span class="icon">🎯</span>未做优先</button>
       <button class="qa-btn" onclick="startWrongOnly()"><span class="icon">📕</span>错题重练</button>
       <button class="qa-btn" onclick="startExam()"><span class="icon">⏱️</span>模拟考试</button>
       <button class="qa-btn" onclick="startByChapter(-1)"><span class="icon">📚</span>章节选择</button>
@@ -240,6 +241,24 @@ function startRandom(){
   startQuiz(qs, 'practice', '🎲 随机练习（'+pc+'题）');
 }
 
+function getUnattemptedQuestions(){
+  return QUESTIONS.filter(q => !(state.progress[q.id] && state.progress[q.id].answered>0));
+}
+function startUnattempted(){
+  const pc = state.settings.practiceCount || 25;
+  let pool = getUnattemptedQuestions();
+  const newCount = pool.length;
+  if(newCount===0){ showToast('🎉 全部题目都已刷过，可切错题重练复习'); return; }
+  shuffleArray(pool);
+  if(newCount < pc){
+    const done = QUESTIONS.filter(q => state.progress[q.id] && state.progress[q.id].answered>0);
+    shuffleArray(done);
+    pool = pool.concat(done.slice(0, pc-newCount));
+  }
+  const qs = pool.slice(0, pc);
+  const t = newCount >= qs.length ? ('🎯 未做优先（新题'+qs.length+'题）') : ('🎯 未做优先（新题'+newCount+'/'+qs.length+'题）');
+  startQuiz(qs, 'practice', t);
+}
 function startWrongOnly(){
   const qs = getWrongQuestions();
   if(!qs.length) return showToast('暂无错题');
